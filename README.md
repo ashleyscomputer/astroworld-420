@@ -6,7 +6,7 @@ Dark smoothie storefront and authenticated admin dashboard, built with React, Ne
 
 The portal reveals on arrival and replays automatically when scrolled back into view; its video loops continuously. There is no replay button. The requested promotional clutter is removed. The supplied artwork remains in the 3D brand panel and social preview.
 
-`/admin` provides customer/admin orders, manual order creation, search, stock and unit-cost editing, payment/status recording, restock actions, stock history. The requested initial login is `admin` / `admin`, bootstrapped from server runtime secrets. Passwords are salted/hashed in D1; sessions use HTTP-only SameSite cookies, Secure on HTTPS. The private ChatGPT access gate remains intact. Changing the bootstrap environment value does not rotate a password already stored in D1.
+`/admin` provides customer/admin orders, manual order creation, search, stock and unit-cost editing, payment/status recording, restock actions, stock history. The initial admin username is configurable. On a fresh local install the launcher generates a random strong password in the ignored `.dev.vars` file; there is no fixed default password. Bootstrap credentials must be changed after initial commissioning. Passwords are salted/hashed in D1; sessions use HTTP-only SameSite cookies, Secure on HTTPS. The private ChatGPT access gate remains intact. Changing the bootstrap environment value does not rotate a password already stored in D1.
 
 Stock starts at zero until entered by the admin. Banana = 100 g makes 100 g available. Orders reserve 1 g or 0.5 g. Reservation and order writes are atomic. Database triggers prevent overselling; request IDs prevent duplicate deductions. Cancellation or a recorded refund with restock restores units exactly once. Closed orders cannot reopen. Historical preview orders are preserved and shown separately, without affecting current stock or sales metrics.
 
@@ -18,7 +18,7 @@ No online gateway, email provider, automatic courier service is connected. Payme
 
 The working project is in the Desktop folder **Astroworld 420**. Double-click **Start Astroworld.cmd**, or run `npm run local` in this folder. Node 22.13+ is required. The launcher installs dependencies if missing, builds the current source, applies pending local migrations, and serves **http://localhost:3000**. Keep its window open while using the store. If another application occupies port 3000, the launcher reports this without stopping it.
 
-The initial local admin login is **admin / admin** at **http://localhost:3000/admin**. Each new local product starts with **100 g and an illustrative R20 per gram cost** so checkout can be tried immediately. Edit these under Inventory. Orders, stock, costs and admin sessions persist in ignored `.wrangler/state`; restarting never resets existing stock. The cancelled “Local checkout test” order is retained as an audit trail. Production stock is separate and starts at zero until entered by the admin.
+The initial local admin username is **admin** at **http://localhost:3000/admin**. Read `ADMIN_INITIAL_PASSWORD` in the ignored local `.dev.vars` file for the generated first-use password. Do not share or commit this file. Each new local product starts with **100 g and an illustrative R20 per gram cost** so checkout can be tried immediately. Edit these under Inventory. Orders, stock, costs and admin sessions persist in ignored `.wrangler/state`; restarting never resets existing stock. The cancelled “Local checkout test” order is retained as an audit trail. Production stock is separate and starts at zero until entered by the admin.
 
 Local credentials live in ignored `.dev.vars`, and the generated preview configuration stays in ignored `.sites-runtime`, outside deployable build files. Local databases and personal Desktop photos are excluded from publication and GitHub. Stop this server before rebuilding on Windows. `npm run dev` also defaults to port 3000 for source development; the launcher is the complete local store with a durable database.
 
@@ -63,7 +63,7 @@ npx tsc --noEmit
 npm run test:store
 ```
 
-The suite changes only a loopback preview database and creates synthetic example.invalid orders. It verifies admin authorization, full/half stock, paid/projected profit, concurrent last-unit purchases, duplicate submissions, cancellation/refund restoration, confirmation-token privacy, tracking, and routes. Do not target a real trading site.
+Set `ADMIN_TEST_PASSWORD` in the QA terminal to the initial admin password from the isolated QA environment (never production). The suite changes only a loopback preview database and creates synthetic example.invalid orders. It verifies admin authorization, full/half stock, paid/projected profit, concurrent last-unit purchases, duplicate submissions, cancellation/refund restoration, confirmation-token privacy, tracking, and routes. Do not target a real trading site.
 
 Browser QA covers sign-in, editable stock, manual order creation, payment recording, metrics, responsive layouts and the automatic portal.
 

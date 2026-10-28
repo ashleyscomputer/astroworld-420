@@ -1,10 +1,11 @@
+import {generateBootstrapPassword} from './bootstrap-password.mjs';
 import fs from 'node:fs/promises';import path from 'node:path';import {spawnSync} from 'node:child_process';import {fileURLToPath} from 'node:url';import net from 'node:net';import {localConfig} from './local-config.mjs';
 process.chdir(fileURLToPath(new URL('../',import.meta.url)));
 const port=Number(process.env.PORT||3000);if(!Number.isInteger(port)||port<1024||port>65535)throw new Error('Choose a port between 1024 and 65535.');
 await new Promise((resolve,reject)=>{const socket=net.createConnection({host:'127.0.0.1',port});socket.once('connect',()=>{socket.destroy();reject(new Error(`Port ${port} is already in use. Close the existing server before starting Astroworld.`));});socket.once('error',()=>resolve());});
 function run(args){const result=spawnSync(process.execPath,args,{stdio:'inherit',env:process.env});if(result.error)throw result.error;if(result.status!==0)process.exit(result.status||1);}
 try{await fs.access('node_modules/vinext');}catch{run(['scripts/install-ci.mjs']);}
-try{await fs.access('.dev.vars');}catch{await fs.writeFile('.dev.vars','ADMIN_USERNAME=admin\nADMIN_INITIAL_PASSWORD=admin\n');}
+try{await fs.access('.dev.vars');}catch{await fs.writeFile('.dev.vars',`ADMIN_USERNAME=admin\nADMIN_INITIAL_PASSWORD=${generateBootstrapPassword()}\n`,{flag:'wx',mode:0o600});console.log('Created local bootstrap credentials in ignored .dev.vars. Keep this file private and change the initial password after first login.');}
 if(process.env.ASTROWORLD_SKIP_BUILD!=='1')run(['scripts/run-framework.mjs','build']);
 const configPath=await localConfig(),state=path.resolve(process.env.ASTROWORLD_STATE||'.wrangler/state');
 const cli=['--import','./scripts/sites-env.mjs','./node_modules/wrangler/bin/wrangler.js'];

@@ -9,7 +9,7 @@ export async function login(request:Request,username:string,password:string){
  sameOrigin(request);const db=database(),now=Date.now();const key=await digest((request.headers.get('cf-connecting-ip')||'local')+':'+username.toLowerCase());
  await db.prepare('INSERT INTO login_attempts(key,count,reset_at) VALUES(?,1,?) ON CONFLICT(key) DO UPDATE SET count=CASE WHEN reset_at<? THEN 1 ELSE count+1 END,reset_at=CASE WHEN reset_at<? THEN excluded.reset_at ELSE reset_at END').bind(key,now+900000,now,now).run();
  const attempts=await db.prepare('SELECT count FROM login_attempts WHERE key=?').bind(key).first<{count:number}>();if((attempts?.count||0)>8)throw new Error('Too many attempts. Try again in 15 minutes.');
- const initial=runtime('ADMIN_INITIAL_PASSWORD');const adminName=runtime('ADMIN_USERNAME')||'admin';
+ const initial=runtime('ADMIN_INITIAL_PASSWORD');if(initial&&initial.length<16)throw new Error('ADMIN_BOOTSTRAP_WEAK');const adminName=runtime('ADMIN_USERNAME')||'admin';
  if(username===adminName&&initial){const salt=crypto.randomUUID();await db.prepare('INSERT OR IGNORE INTO admin_users(username,salt,password_hash) VALUES(?,?,?)').bind(adminName,salt,await passwordHash(initial,salt)).run();}
  const user=await db.prepare('SELECT * FROM admin_users WHERE username=?').bind(username).first<{salt:string;password_hash:string}>();
  if(!user||!equal(await passwordHash(password,user.salt),user.password_hash))throw new Error('Username or password is incorrect.');

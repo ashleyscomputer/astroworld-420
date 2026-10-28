@@ -27,3 +27,4 @@ export const members=sqliteTable('members',{id:text('id').primaryKey(),email:tex
 export const memberSessions=sqliteTable('member_sessions',{hash:text('hash').primaryKey(),memberId:text('member_id').notNull().references(()=>members.id),expires:integer('expires').notNull()});
 export const memberPasses=sqliteTable('member_passes',{hash:text('hash').primaryKey(),memberId:text('member_id').notNull().references(()=>members.id),expires:integer('expires').notNull()});
 export const memberOrders=sqliteTable('member_orders',{orderId:text('order_id').primaryKey().references(()=>orders.id),memberId:text('member_id').notNull().references(()=>members.id)},t=>[index('member_orders_member_idx').on(t.memberId)]);
+export const firebaseIdentities=sqliteTable('firebase_identities',{uid:text('uid').primaryKey(),memberId:text('member_id').notNull().unique().references(()=>members.id),createdAt:text('created_at').notNull()});

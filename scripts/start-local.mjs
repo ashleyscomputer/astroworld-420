@@ -14,5 +14,5 @@ const seed=path.resolve('.sites-runtime/local-demo-stock.sql');
 const names=['super-berry','white-cheese','banana','atomic','caramel','rack','sunset','cheese'];
 await fs.writeFile(seed,names.map(id=>`INSERT OR IGNORE INTO inventory(product_id,half_units,cost_cents,revision,updated_at) VALUES('${id}',200,2000,0,datetime('now'));`).join('\n'));
 run([...cli,'d1','execute','DB','--local','--config',configPath,'--persist-to',state,'--file',seed]);
-console.log('Local demo: each new product starts at 100 full portions with R20 example cost. Admin changes and orders persist.');
+console.log('Local demo: each new product starts at 100 g with R20 example cost per gram. Admin changes and orders persist.');
 await import('./preview-store.mjs');

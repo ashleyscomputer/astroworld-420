@@ -22,12 +22,11 @@ await request('/api/admin/orders','PATCH',{id:row.id,action:'cancel',revision:ro
 await stock('banana',100,20);const duplicateBody=body();const dupes=await Promise.all(Array.from({length:6},async()=>{const r=await fetch(base+'/api/orders',{method:'POST',headers:{'Content-Type':'application/json',Origin:base},body:JSON.stringify(duplicateBody)});assert.ok([200,201].includes(r.status));return await r.json();}));assert.equal(new Set(dupes.map(d=>d.id)).size,1);assert.equal((await board()).inventory.find(p=>p.id==='banana').stock,99);checks+=2;
 d=await board();row=d.orders.find(o=>o.id===order.id);await request('/api/admin/orders','PATCH',{id:row.id,action:'refund',revision:row.revision},true);d=await board();assert.equal(d.inventory.find(p=>p.id==='banana').stock,100);assert.equal(d.metrics.revenue,start.metrics.revenue);assert.equal(d.metrics.profit,start.metrics.profit);checks+=3;
 await stock('atomic',0,null);const prior=(await board()).inventory.find(p=>p.id==='banana').stock;await request('/api/orders','POST',body([{productId:'banana',size:'full',quantity:1},{productId:'atomic',size:'full',quantity:1}]),false,400);assert.equal((await board()).inventory.find(p=>p.id==='banana').stock,prior);checks++;
-await request('/api/admin/erpnext','POST',{action:'sync'},true,400);
 const home=await (await fetch(base+'/')).text();assert.ok(!home.includes('Replay portal animation'));assert.ok(!home.includes('NOW SERVING GOOD ENERGY'));assert.ok(!home.includes('Real human energy'));checks+=3;
 await stock('banana',1,20);const oneBody=body();const oneDupes=await Promise.all(Array.from({length:5},async()=>{const r=await fetch(base+'/api/orders',{method:'POST',headers:{'Content-Type':'application/json',Origin:base},body:JSON.stringify(oneBody)});assert.ok([200,201].includes(r.status),'Last-unit retry returned '+r.status);return await r.json();}));assert.equal(new Set(oneDupes.map(d=>d.id)).size,1);assert.equal((await board()).inventory.find(p=>p.id==='banana').stock,0);checks+=2;
 const blocked=await fetch(base+'/api/admin/inventory',{method:'PATCH',headers:{Cookie:cookie,Origin:'https://untrusted.example.invalid'}});assert.equal(blocked.status,400);await blocked.text();checks++;
 await stock('banana',100,20);
 await request('/api/admin/session','DELETE',undefined,true);await request('/api/admin','GET',undefined,true,401);
-console.log(`PASS: ${checks} admin authentication, stock, half portions, paid/projected profit, concurrent oversell, idempotency, cancellation/refund, customer tracking, ERP offline and cleanup checks.`);
+console.log(`PASS: ${checks} admin authentication, stock, gram sizes, paid/projected profit, concurrent oversell, idempotency, cancellation/refund, customer tracking and cleanup checks.`);
 
 

@@ -22,7 +22,6 @@ export async function placeOrder(input:unknown,source:'customer'|'admin',memberI
   db.prepare('INSERT INTO sales(order_id,state,payment_state,source,net_cents,cost_cents,total_cents,revision,updated_at) VALUES(?,?,?,?,?,?,?,?,?)').bind(id,'pending','pending',source,Math.round((quote.subtotal-quote.discount)*100),costCents,Math.round(quote.total*100),0,now),
   ...(memberId?[db.prepare('INSERT INTO member_orders(order_id,member_id) VALUES(?,?)').bind(id,memberId)]:[]),
   ...lines.map(l=>db.prepare('INSERT INTO order_lines(id,order_id,product_id,half_units,cost_cents) VALUES(?,?,?,?,?)').bind(l.id,id,l.productId,l.halfUnits,l.costCents)),
-  db.prepare("INSERT INTO erp_jobs(id,kind,entity_id,status,updated_at) VALUES(?, 'order', ?, 'pending', ?)").bind('order:'+id,id,now),
  ]);}catch(e){const duplicate=await db.prepare('SELECT id,token,email FROM orders WHERE request_id=?').bind(b.requestId).first<{id:string;token:string;email:string}>();if(duplicate&&duplicate.email===email)return {...duplicate,duplicate:true};if(String(e).includes('INSUFFICIENT_STOCK'))throw new Error('Stock changed while you checked out. Refresh your bag and try again.');throw e;}
  return {id,token,duplicate:false};
 }
@@ -38,6 +37,5 @@ export async function changeOrder(id:string,action:string,revision:number){
  else{const allowed:Record<string,string[]>={pending:['confirmed'],confirmed:['preparing'],preparing:['ready'],ready:['shipped','completed'],shipped:['completed']};if(!allowed[state]?.includes(action))throw new Error('That status transition is not available.');if(action==='completed'&&payment!=='paid')throw new Error('Record payment before completing the order.');state=action;}
  const now=new Date().toISOString();await db.batch([
   db.prepare('UPDATE sales SET state=?,payment_state=?,revision=CASE WHEN revision=? THEN revision+1 ELSE -1 END,updated_at=? WHERE order_id=?').bind(state,payment,revision,now,id),
-  db.prepare("INSERT INTO erp_jobs(id,kind,entity_id,status,updated_at) VALUES(?, 'order', ?, 'pending', ?) ON CONFLICT(id) DO UPDATE SET status='pending',version=erp_jobs.version+1,updated_at=excluded.updated_at,error=NULL").bind('order:'+id,id,now),
  ]);
 }

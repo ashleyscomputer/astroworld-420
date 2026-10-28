@@ -1,2 +1,0 @@
-import {requireAdmin} from '@/lib/admin-auth';import {syncERP} from '@/lib/erpnext';import {json} from '@/lib/server-db';import {z} from 'zod';
-export async function POST(request:Request){try{await requireAdmin(request,true);const b=z.object({action:z.enum(['test','sync'])}).parse(await request.json());return json(await syncERP(b.action==='test'));}catch(e){return json({error:e instanceof Error?e.message:'ERPNext is unavailable.'},String(e).includes('ADMIN_AUTH_REQUIRED')?401:400);}}

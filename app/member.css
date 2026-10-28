@@ -3,3 +3,5 @@
 .member-admin-row .admin-danger{width:auto}.member-code{display:block;overflow-wrap:anywhere;color:#b5a9bf;font-size:11px;margin:12px 0}.scanner-video:not([hidden]){display:block;margin:20px 0}.member-page summary{cursor:pointer;color:#c6b5d2;font-size:11px}
 
 .member-link-order{display:flex;gap:12px;align-items:end;margin:24px 0;flex-wrap:wrap}.member-link-order .form-field{flex:1;min-width:200px}.member-link-order .button{min-height:42px}
+
+.google-signin{margin:14px 0}.google-signin .button{width:100%;justify-content:center}.google-signin .error{margin-top:10px}

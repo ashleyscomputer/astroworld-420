@@ -1,5 +1,5 @@
-import {requireAdmin} from '@/lib/admin-auth';import {ensureInventory} from '@/lib/commerce';import {database,json} from '@/lib/server-db';import {products} from '@/lib/catalog';
-export async function GET(request:Request){try{await requireAdmin(request);await ensureInventory();const db=database(),params=new URL(request.url).searchParams,offset=Math.max(0,Math.min(100000,Number(params.get('offset'))||0));const search=(params.get('search')||'').slice(0,100),pattern='%'+search+'%';
+import {requireStaff} from '@/lib/admin-auth';import {ensureInventory} from '@/lib/commerce';import {database,json} from '@/lib/server-db';import {products} from '@/lib/catalog';
+export async function GET(request:Request){try{await requireStaff(request,'dashboard');await ensureInventory();const db=database(),params=new URL(request.url).searchParams,offset=Math.max(0,Math.min(100000,Number(params.get('offset'))||0));const search=(params.get('search')||'').slice(0,100),pattern='%'+search+'%';
  const [stock,orderRows,metricRows,history]=await Promise.all([
  db.prepare('SELECT * FROM inventory').all<any>(),
  db.prepare("SELECT o.id,o.payload,o.created_at,s.state,s.payment_state,s.source,s.revision,s.net_cents,s.cost_cents FROM orders o LEFT JOIN sales s ON s.order_id=o.id WHERE o.id LIKE ? OR o.email LIKE ? OR json_extract(o.payload,'$.customer.name') LIKE ? ORDER BY o.created_at DESC LIMIT 100 OFFSET ?").bind(pattern,pattern,pattern,offset).all<any>(),

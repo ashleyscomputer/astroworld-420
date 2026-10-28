@@ -1,0 +1,2 @@
+# Staff RBAC review
+Four server-side staff roles are enforced at existing admin endpoints. Super Admin can update existing staff roles and disable access. Invitation/creation, MFA and credential recovery remain unimplemented. The additive migration grants initial legacy admin Super Admin and must be reviewed before deployment. No live D1 migration or deployment executed. UI is not yet fully role-specific. Isolated integration and runtime testing remain required.

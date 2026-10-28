@@ -27,3 +27,11 @@ a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}b
 
 /* Clear, restrained typography across the storefront and administration. */
 :root,body,button,input,select,textarea{font-family:Inter,Helvetica,sans-serif}h1,h2,h3,h4,h5,h6,.brand{font-family:Inter,Helvetica,sans-serif}h1 em,h2 em,h3 em{font-family:inherit;font-style:normal;font-weight:inherit}
+
+/* ASTROWORLD 2.0: the first O is an animated, accessible Earth sphere. */
+.earth-word{display:inline;white-space:nowrap}
+.earth-letter{position:relative;display:inline-block;width:.79em;height:.79em;margin-inline:.015em;vertical-align:-.075em;letter-spacing:0;line-height:1;border-radius:50%;overflow:hidden;isolation:isolate;background:radial-gradient(circle at 32% 26%,#b8f0ff 0%,#5db9dd 19%,#2383b7 46%,#0f3c78 77%,#08162d 100%);box-shadow:inset -.07em -.04em .15em #06152a,0 0 .17em #75d0ec42,0 0 0 .008em #c6e7ff80}
+.earth-letter__continents{position:absolute;inset:0 auto 0 0;width:200%;height:100%;background-image:url('/art/earth-map.svg');background-size:50% 100%;background-repeat:repeat-x;animation:earth-word-spin 18s linear infinite;will-change:transform}
+.earth-letter__lighting{position:absolute;inset:0;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 30% 23%,#ffffff83 0%,#ffffff17 22%,transparent 42%),linear-gradient(90deg,#00132700 35%,#00132732 71%,#000d25a8 100%);box-shadow:inset -.08em -.04em .13em #02132691}
+@keyframes earth-word-spin{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.earth-letter__continents{animation:none;will-change:auto}}

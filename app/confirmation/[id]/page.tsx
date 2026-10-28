@@ -1,0 +1,1 @@
+import {ConfirmationPage} from '../../checkout-ui';export const metadata={title:'Order confirmation',robots:{index:false,follow:false}};export default async function Page({params}:{params:Promise<{id:string}>}){const {id}=await params;return <ConfirmationPage id={id}/>;}

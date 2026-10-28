@@ -5,7 +5,7 @@ export async function ensureInventory(){const db=database(),now=new Date().toISO
 export async function currentProducts(){await ensureInventory();const rows=await database().prepare('SELECT product_id,half_units FROM inventory').all<{product_id:string;half_units:number}>();const stock=new Map(rows.results.map(r=>[r.product_id,r.half_units/2]));return products.map(p=>({...p,stock:stock.get(p.id)||0}));}
 export async function quoteOrder(items:CartItem[],method:string,code:string){return calculate(items,method,code,await currentProducts());}
 export const orderSchema=z.object({requestId:z.string().uuid(),items:z.array(z.object({productId:z.string(),size:z.enum(['full','half']),quantity:z.number().int().min(1).max(20)})).min(1).max(40),customer:z.object({name:z.string().trim().min(2).max(100),email:z.string().trim().email().max(200),phone:z.string().trim().regex(/^\+?[\d\s()-]{9,18}$/),street:z.string().max(200).default(''),suburb:z.string().max(100).default(''),city:z.string().max(100).default(''),province:z.string().max(40).default(''),postal:z.string().max(10).default(''),notes:z.string().max(1000).default('')}),method:z.enum(['courier','collection']),code:z.string().max(40).default(''),terms:z.literal(true),privacy:z.literal(true),age:z.boolean().optional(),payment:z.literal('preview')});
-export async function placeOrder(input:unknown,source:'customer'|'admin'){
+export async function placeOrder(input:unknown,source:'customer'|'admin',memberId?:string){
  const b=orderSchema.parse(input),db=database(),email=b.customer.email.toLowerCase();
  const existing=await db.prepare('SELECT id,token,email FROM orders WHERE request_id=?').bind(b.requestId).first<{id:string;token:string;email:string}>();
  if(existing){if(existing.email!==email)throw new Error('Please restart checkout.');return {...existing,duplicate:true};}
@@ -20,6 +20,7 @@ export async function placeOrder(input:unknown,source:'customer'|'admin'){
  try{await db.batch([
   db.prepare('INSERT INTO orders(id,request_id,email,token,payload,created_at) VALUES(?,?,?,?,?,?)').bind(id,b.requestId,email,token,JSON.stringify(payload),now),
   db.prepare('INSERT INTO sales(order_id,state,payment_state,source,net_cents,cost_cents,total_cents,revision,updated_at) VALUES(?,?,?,?,?,?,?,?,?)').bind(id,'pending','pending',source,Math.round((quote.subtotal-quote.discount)*100),costCents,Math.round(quote.total*100),0,now),
+  ...(memberId?[db.prepare('INSERT INTO member_orders(order_id,member_id) VALUES(?,?)').bind(id,memberId)]:[]),
   ...lines.map(l=>db.prepare('INSERT INTO order_lines(id,order_id,product_id,half_units,cost_cents) VALUES(?,?,?,?,?)').bind(l.id,id,l.productId,l.halfUnits,l.costCents)),
   db.prepare("INSERT INTO erp_jobs(id,kind,entity_id,status,updated_at) VALUES(?, 'order', ?, 'pending', ?)").bind('order:'+id,id,now),
  ]);}catch(e){const duplicate=await db.prepare('SELECT id,token,email FROM orders WHERE request_id=?').bind(b.requestId).first<{id:string;token:string;email:string}>();if(duplicate&&duplicate.email===email)return {...duplicate,duplicate:true};if(String(e).includes('INSUFFICIENT_STOCK'))throw new Error('Stock changed while you checked out. Refresh your bag and try again.');throw e;}

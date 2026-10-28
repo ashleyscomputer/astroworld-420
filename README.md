@@ -36,6 +36,16 @@ The hero uses the supplied island video, revealing from a line through a circle 
 - `lib/erpnext-client.ts`, `lib/erpnext.ts`: REST adapter and persistent export queue.
 - `public/astroworld-420-brand.jpg`: user artwork, used as supplied with CSS layout effects.
 
+## Membership and QR collection
+
+Customers register or sign in at /member. New accounts are pending until a signed-in staff member checks the customer's details and approves the request under Admin → Members & scan. Email verification and password recovery are not configured; staff must verify identity before approval. Disabled members cannot generate a valid pass.
+
+An active member's page creates a new QR pass every minute; passes expire after two minutes and contain an opaque random token, not personal information. Staff open the camera scanner in the admin dashboard; it requires HTTPS or localhost and camera permission. Customers can expand the pass to show a short-lived code for manual entry. Scan results are available only to authenticated admins and display the profile, linked orders, and any order whose fulfilment method is collection and status is Ready. Staff can disable a membership immediately.
+
+Orders placed while signed in are linked automatically. Staff can link a guest or store-created order using its order number after checking the customer's details. An order already linked to another member cannot be reassigned through this flow. The local and hosted databases are separate. The hosted site is currently owner-private; customers need an accessible deployment and HTTPS for real use.
+
+Run `node scripts/verify-members.mjs` against the isolated local preview on port 3001 to test membership and order linking. It creates synthetic local test records. The scanner and QR generator use locally bundled dependencies.
+
 ## ERPNext
 
 ERPNext requires a separate Python/Frappe host; it cannot run in this Cloudflare Worker. No instance was supplied and Docker is unavailable in this environment. `scripts/setup-erpnext.ps1` prepares the pinned official Docker evaluation stack once Docker is available. That loopback-only disposable demo is not production hosting or reachable from the published store.

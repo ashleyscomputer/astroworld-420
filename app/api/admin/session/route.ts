@@ -1,4 +1,4 @@
-import {z} from 'zod';import {adminIdentity,login,logout,sessionCookie} from '@/lib/admin-auth';import {json} from '@/lib/server-db';
-export async function GET(request:Request){return json({user:await adminIdentity(request)});}
+import {z} from 'zod';import {staffIdentity,login,logout,sessionCookie} from '@/lib/admin-auth';import {json} from '@/lib/server-db';
+export async function GET(request:Request){return json({user:await staffIdentity(request)});}
 export async function POST(request:Request){try{const b=z.object({username:z.string().trim().min(1).max(100),password:z.string().min(1).max(200)}).parse(await request.json());const token=await login(request,b.username,b.password);return Response.json({ok:true},{headers:{'Cache-Control':'no-store','Set-Cookie':sessionCookie(request,token)}});}catch(e){return json({error:e instanceof z.ZodError?'Enter your username and password.':e instanceof Error?e.message:'Sign-in failed.'},401);}}
 export async function DELETE(request:Request){try{await logout(request);return Response.json({ok:true},{headers:{'Cache-Control':'no-store','Set-Cookie':sessionCookie(request,'',0)}});}catch{return json({error:'Please sign in.'},401);}}

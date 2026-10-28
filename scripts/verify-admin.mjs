@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-const base=process.env.TEST_BASE_URL||'http://127.0.0.1:5180';if(!['127.0.0.1','localhost'].includes(new URL(base).hostname))throw new Error('This stock-changing test only runs on a local preview.');
+const base=process.env.TEST_BASE_URL||'http://127.0.0.1:3001';if(!['127.0.0.1','localhost'].includes(new URL(base).hostname))throw new Error('This stock-changing test only runs on a local preview.');
 let cookie='',checks=0;
 async function request(path,method='GET',body,admin=false,expected=200){const r=await fetch(base+path,{method,headers:{'Content-Type':'application/json',Origin:base,...(admin?{Cookie:cookie}:{})},...(body?{body:JSON.stringify(body)}:{})});const raw=await r.text();let d;try{d=JSON.parse(raw);}catch{throw new Error(path+' HTTP '+r.status+': '+raw.slice(0,150));}assert.equal(r.status,expected,`${path}: ${JSON.stringify(d)}`);checks++;return {data:d,response:r};}
 await request('/api/admin','GET',undefined,false,401);await request('/api/admin/inventory','PATCH',{productId:'banana',stock:100,cost:20,revision:0},false,401);

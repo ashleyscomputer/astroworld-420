@@ -14,23 +14,21 @@ Order value and projected gross profit update on acceptance. Paid sales and paid
 
 No online gateway, email provider, automatic courier service or real ERPNext instance is connected. Payment/refund buttons record manual activity and do not move money. Verified recipes, allergens, portion volumes, business details and final fulfilment policies remain launch inputs.
 
-## Local preview
+## Desktop and localhost
 
-Requires Node 22.13+. Run `npm ci` once. Copy `config/server.env.example` to ignored `.dev.vars`; set local admin credentials and omit ERP variables until an instance exists. For the requested test login set ADMIN_USERNAME and ADMIN_INITIAL_PASSWORD to admin.
+The working project is in the Desktop folder **Astroworld 420**. Double-click **Start Astroworld.cmd**, or run `npm run local` in this folder. Node 22.13+ is required. The launcher installs dependencies if missing, builds the current source, applies pending local migrations, and serves **http://localhost:3000**. Keep its window open while using the store. If another application occupies port 3000, the launcher reports this without stopping it.
 
-```powershell
-npm run build
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_happy_steve_rogers.sql
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0001_eminent_lionheart.sql
-node scripts/preview-store.mjs
-```
+The initial local admin login is **admin / admin** at **http://localhost:3000/admin**. Each new local product starts with **100 full portions and an illustrative R20 full-portion cost** so checkout can be tried immediately. Edit these under Inventory. Orders, stock, costs and admin sessions persist in ignored `.wrangler/state`; restarting never resets existing stock. The cancelled “Local checkout test” order is retained as an audit trail. Production stock is separate and starts at zero until entered by the admin.
 
-Apply migrations once, in order, per fresh local database. Open http://127.0.0.1:5180 and /admin. Stop the preview before rebuilding on Windows. The helper keeps local credentials in an ignored runtime configuration, outside deployable build files. Local data is not published. `npm run dev` is available for development.
+Local credentials live in ignored `.dev.vars`, and the generated preview configuration stays in ignored `.sites-runtime`, outside deployable build files. Local databases and personal Desktop photos are excluded from publication and GitHub. Stop this server before rebuilding on Windows. `npm run dev` also defaults to port 3000 for source development; the launcher is the complete local store with a durable database.
+
+The hero uses the supplied island video, revealing from a line through a circle into a pill; it replays on scrolling back into view. The separate scroll sequence after the collection uses Three.js for the globe, cloud layer, stars and seeded strawberry. It includes opt-in synthesized ambient sound, motion controls, reduced-motion support and an animated Canvas 2D fallback. All artwork is illustrative.
 
 ## Edit source
 
 - `lib/catalog.ts`: names, prices, artwork, delivery and discounts. Full prices are R30, R70, R70, R100, R130, R140, R150, R160 in product order. Half prices are exactly 50%.
-- `app/storefront.tsx`, `app/globals.css`: customer interface and motion.
+- `app/storefront.tsx`, `app/globals.css`: customer interface.
+- `app/portal-hero.tsx`, `app/orbital-experience.tsx`, `app/experience.css`, `lib/cosmic-scene.ts`: hero and scrolling animation.
 - `app/admin-ui.tsx`, `app/admin.css`: admin interface.
 - `lib/commerce.ts`: authoritative prices, reservations, cost snapshots and order changes.
 - `lib/admin-auth.ts`: credentials, sessions and login throttling.
@@ -48,11 +46,15 @@ See [ERPNext integration setup](integrations/erpnext/README.md) for configuratio
 
 ## Verify
 
-With the local preview running:
+Use a separate local database on port 3001 for the stock-changing test suite:
 
 ```powershell
+$env:PORT="3001"
+$env:ASTROWORLD_STATE=".wrangler/qa-state"
+npm run local
+# In a second terminal:
 npx tsc --noEmit
-node --experimental-strip-types scripts/verify-store.mjs
+npm run test:store
 ```
 
 The suite changes only a loopback preview database and creates synthetic example.invalid orders. It verifies admin authorization, full/half stock, paid/projected profit, concurrent last-unit purchases, duplicate submissions, cancellation/refund restoration, confirmation-token privacy, tracking, offline ERP behavior and routes. The ERP contract test uses an in-memory stub, not a live ERP installation. Do not target a real trading site.

@@ -1,1 +1,1 @@
-export default function robots(){return {rules:{userAgent:'*',allow:'/',disallow:['/api/','/checkout','/confirmation/','/tracking']},sitemap:'https://astroworld-smoothie-orbit.maritzliam.chatgpt.site/sitemap.xml'};}
+export default function robots(){return {rules:{userAgent:'*',allow:'/',disallow:['/admin','/api/','/checkout','/confirmation/','/tracking']},sitemap:'https://astroworld-smoothie-orbit.maritzliam.chatgpt.site/sitemap.xml'};}

@@ -1,3 +1,3 @@
-import {calculate} from '@/lib/catalog';import {z} from 'zod';
+import {quoteOrder} from '@/lib/commerce';import {z} from 'zod';
 const schema=z.object({items:z.array(z.object({productId:z.string(),size:z.enum(['full','half']),quantity:z.number().int().min(1).max(20)})).min(1).max(40),method:z.enum(['courier','collection']).default('courier'),code:z.string().max(40).default('')});
-export async function POST(request:Request){try{const b=schema.parse(await request.json());return Response.json(calculate(b.items,b.method,b.code));}catch(e){return Response.json({error:e instanceof z.ZodError?'Please check your items and delivery option.':e instanceof Error?e.message:'Please check your bag.'},{status:400});}}
+export async function POST(request:Request){try{const b=schema.parse(await request.json());return Response.json(await quoteOrder(b.items,b.method,b.code),{headers:{'Cache-Control':'no-store'}});}catch(e){return Response.json({error:e instanceof z.ZodError?'Please check your items and delivery option.':e instanceof Error?e.message:'Please check your bag.'},{status:400});}}

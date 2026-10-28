@@ -1,66 +1,64 @@
 # Astroworld 420
 
-A dark, responsive smoothie storefront with a floating-island portal reveal, scroll-driven 3D sculpture, procedural abstract artwork, product tilt and neon glow. Built with the Next.js App Router API on Vinext for Cloudflare Workers, React, Tailwind CSS and Framer Motion. No admin interface.
+Dark smoothie storefront and authenticated admin dashboard, built with React, Next.js App Router APIs on Vinext, Tailwind, Framer Motion and Cloudflare D1.
 
-## Run locally
+## Customer and admin
 
-Requires Node 22.13+.
+The portal reveals on arrival and replays automatically when scrolled back into view; its video loops continuously. There is no replay button. The requested promotional clutter is removed. The supplied artwork remains in the 3D brand panel and social preview.
 
-```powershell
-npm ci
-npm run dev
-```
+`/admin` provides customer/admin orders, manual order creation, search, stock and unit-cost editing, payment/status recording, restock actions, stock history and an ERPNext export queue. The requested initial login is `admin` / `admin`, bootstrapped from server runtime secrets. Passwords are salted/hashed in D1; sessions use HTTP-only SameSite cookies, Secure on HTTPS. The private ChatGPT access gate remains intact. Changing the bootstrap environment value does not rotate a password already stored in D1.
 
-For the built preview and its local database:
+Stock starts at zero until entered by the admin. Banana = 100 makes 100 full portions available. Full orders reserve 1, half orders 0.5. Reservation and order writes are atomic. Database triggers prevent overselling; request IDs prevent duplicate deductions. Cancellation or a recorded refund with restock restores units exactly once. Closed orders cannot reopen. Historical preview orders are preserved and shown separately, without affecting current stock or sales metrics.
+
+Order value and projected gross profit update on acceptance. Paid sales and paid gross profit update when payment is recorded. Gross profit is product revenue after discounts minus recorded product costs, excluding delivery, payment fees and overheads. Costs are snapshotted at acceptance; missing costs remain unknown. Customer confirmation/tracking reflect admin status changes.
+
+No online gateway, email provider, automatic courier service or real ERPNext instance is connected. Payment/refund buttons record manual activity and do not move money. Verified recipes, allergens, portion volumes, business details and final fulfilment policies remain launch inputs.
+
+## Local preview
+
+Requires Node 22.13+. Run `npm ci` once. Copy `config/server.env.example` to ignored `.dev.vars`; set local admin credentials and omit ERP variables until an instance exists. For the requested test login set ADMIN_USERNAME and ADMIN_INITIAL_PASSWORD to admin.
 
 ```powershell
 npm run build
 node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_happy_steve_rogers.sql
-npm start -- --port 5180
+node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0001_eminent_lionheart.sql
+node scripts/preview-store.mjs
 ```
 
-Apply the migration once per fresh local database. Stop the built preview before rebuilding on Windows, because Wrangler holds build files open. Local D1 records are stored in ignored `.wrangler/`; production D1 is provisioned by Sites. Local test data is not published.
+Apply migrations once, in order, per fresh local database. Open http://127.0.0.1:5180 and /admin. Stop the preview before rebuilding on Windows. The helper keeps local credentials in an ignored runtime configuration, outside deployable build files. Local data is not published. `npm run dev` is available for development.
 
-## Edit the store
+## Edit source
 
-- `lib/catalog.ts`: the single product and settings source. API routes calculate authoritative prices from this file. All eight full prices are R30, R70, R70, R100, R130, R140, R150 and R160 in the supplied product order. A half portion costs 50% exactly.
-- `app/globals.css`: colour, glow, spacing, type and responsive design tokens.
-- `scripts/make-assets.mjs`: regenerates abstract SVG sculpture placeholders and downloads the user-supplied island clip/poster and self-hosted variable fonts. Product artwork is deliberately illustrative, not a representation of recipes.
-- `app/storefront.tsx`: header, hero, collection, cards, product detail, cart, newsletter and footer.
-- `app/checkout-ui.tsx`: guest checkout, confirmation and tracking.
-- `app/content-ui.tsx`: about, FAQs, contact and preview policy pages.
-- `app/reviews.tsx`: explicitly labelled sample carousel copy. Replace only with verified customer feedback.
-- `db/schema.ts`: durable orders, contact messages and newsletter signups. Append migrations for future changes; do not rewrite applied migrations.
+- `lib/catalog.ts`: names, prices, artwork, delivery and discounts. Full prices are R30, R70, R70, R100, R130, R140, R150, R160 in product order. Half prices are exactly 50%.
+- `app/storefront.tsx`, `app/globals.css`: customer interface and motion.
+- `app/admin-ui.tsx`, `app/admin.css`: admin interface.
+- `lib/commerce.ts`: authoritative prices, reservations, cost snapshots and order changes.
+- `lib/admin-auth.ts`: credentials, sessions and login throttling.
+- `db/schema.ts`, `drizzle/`: append-only schema migrations and reservation/restock/outbox triggers. Never rewrite applied migrations.
+- `lib/erpnext-client.ts`, `lib/erpnext.ts`: REST adapter and persistent export queue.
+- `public/astroworld-420-brand.jpg`: user artwork, used as supplied with CSS layout effects.
 
-## Current capabilities
+## ERPNext
 
-Product pages, quick view, full/half selection, quantity controls, search, price filter, sorting, persistent browser cart, drawer and full cart, discount entry, four-step checkout, all nine SA provinces, courier/collection estimates, server price/stock validation, duplicate-submit protection, saved test orders, private confirmation links, order-number/email tracking, contact and consented signup storage, printable confirmation, supporting pages, metadata, favicon, sitemap, reduced-motion styling and accessible native dialogs.
+ERPNext requires a separate Python/Frappe host; it cannot run in this Cloudflare Worker. No instance was supplied and Docker is unavailable in this environment. `scripts/setup-erpnext.ps1` prepares the pinned official Docker evaluation stack once Docker is available. That loopback-only disposable demo is not production hosting or reachable from the published store.
 
-The preview courier rate is R45. Courier is free at R300 after discounts; collection is free. `ORBIT10` is a 10% preview discount. Product availability is a demonstration value, not inventory reservation. Cart data is browser-local; orders and form submissions use D1.
+The connector exports customer/admin orders as Sales Order drafts and availability as Stock Reconciliation drafts. It supports fractional quantities, prices, discounts, delivery lines, retries and draft reuse. Admins test the connection and export queued changes explicitly. Drafts require review/submission in ERPNext; this is not two-way stock synchronization or automatic accounting/payment posting. No live ERPNext installation has been tested.
 
-## Preview versus real trading
+See [ERPNext integration setup](integrations/erpnext/README.md) for configuration, exact mapping, limitations and primary documentation. API credentials belong only in server runtime secrets.
 
-`settings.demoMode` is true. Orders are explicitly marked preview. No cards are collected, payments are processed, email is sent, inventory is reserved or fulfilment scheduled. Forms explain this. There are no fabricated contact details, bank accounts, social profiles, collection addresses, ingredients, volumes or customer reviews.
+## Verify
 
-Payment, COD and EFT fields in settings are reserved integration switches, not completed payment adapters. Disabling demo mode deliberately refuses orders until a real payment adapter exists. Before accepting real orders, implement and test the selected gateway's server checkout and signed webhooks, inventory reservations, email delivery/outbox and operational fulfilment. Keep all gateway, webhook and email secrets in server environment variables only, never in `lib/catalog.ts` or client code. Then add verified business details, recipe/volume/allergen information, delivery areas and cold-chain procedures, collection location, final policies and privacy contact/retention process. No live trading is enabled by merely changing a boolean.
-
-`ageGate` is false for the smoothie category; it can be enabled for a future appropriate category. WhatsApp appears only when a real number is configured, so there is no broken placeholder contact link. Payment and social icons are not presented as available services without an integration.
-
-## Validation
+With the local preview running:
 
 ```powershell
 npx tsc --noEmit
-node scripts/verify-store.mjs
+node --experimental-strip-types scripts/verify-store.mjs
 ```
 
-The API check runs against `http://127.0.0.1:5180` by default, checks routes, every full/half price, discounts, delivery, invalid quantities, stock bounds, server total tampering, order persistence/idempotency, confirmation-token access, tracking, form validation and 404s. It writes synthetic records using `example.invalid` addresses to the selected preview database. Do not target a real trading site. Set `TEST_BASE_URL` only to another test deployment.
+The suite changes only a loopback preview database and creates synthetic example.invalid orders. It verifies admin authorization, full/half stock, paid/projected profit, concurrent last-unit purchases, duplicate submissions, cancellation/refund restoration, confirmation-token privacy, tracking, offline ERP behavior and routes. The ERP contract test uses an in-memory stub, not a live ERP installation. Do not target a real trading site.
 
-Desktop and mobile browser checks cover the portal, quick view, half portion, cart, native page navigation, guest checkout, confirmation and tracking. Navigation uses native document links, retaining the bag through localStorage.
+Browser QA covers sign-in, editable stock, manual order creation, payment recording, metrics, responsive layouts and the automatic portal.
 
-## Hosting
+## Hosting and source
 
-`.openai/hosting.json` retains this site's project identity and D1 binding. The Sites workflow packages the exact pushed source and build for private publication. Preserve the hosting manifest and generated schema migrations; credentials and local runtime state remain ignored.
-
-## Supplied brand artwork
-
-`public/astroworld-420-brand.jpg` is the user-supplied Astroworld 420 image. It appears in the scrolling 3D brand panel on Home and Our world, and in Open Graph previews. Header, hero, footer and metadata use the Astroworld 420 name. The image is used as supplied, with layout effects applied in CSS.
+Preserve `.openai/hosting.json` and generated migrations. Native Sites publication applies migrations before the Worker upload. Runtime credentials, dependencies, build output and local test data remain outside GitHub. The private GitHub remote is `github`: https://github.com/ashleyscomputer/astroworld-420.

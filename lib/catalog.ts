@@ -9,9 +9,9 @@ const catalog = [
  ['Sunset',150,'#ffa27e','#ea5cba','Catch a feeling. Chase the glow.',20],
  ['Cheese',160,'#ffc875','#ff854d','Smooth by nature. Bold by design.',18],
 ];
-export const products:Product[] = catalog.map((p,i)=>{const name=String(p[0]);const slug=name.toLowerCase().replaceAll(' ','-');return {id:slug,slug,name,price:Number(p[1]),glowColor:String(p[2]),accent:String(p[3]),shortDescription:String(p[4]),longDescription:`${p[4]} Meet ${name}, one of eight expressive Astroworld smoothie originals. A colourful escape from the everyday, with a portion that suits your orbit. Choose a full portion or a half-size adventure.`,stock:Number(p[5]),number:String(i+1).padStart(2,'0'),image:`/art/${slug}.svg?v=2`};});
+export const products:Product[] = catalog.map((p,i)=>{const name=String(p[0]);const slug=name.toLowerCase().replaceAll(' ','-');return {id:slug,slug,name,price:Number(p[1]),glowColor:String(p[2]),accent:String(p[3]),shortDescription:String(p[4]),longDescription:`${p[4]} Meet ${name}, one of eight expressive Astroworld 420 smoothie originals. A colourful escape from the everyday, with a portion that suits your orbit. Choose a full portion or a half-size adventure.`,stock:Number(p[5]),number:String(i+1).padStart(2,'0'),image:`/art/${slug}.svg?v=2`};});
 export const settings = {
- brand:'Astroworld',currency:'ZAR',demoMode:true,deliveryFee:45,freeDeliveryThreshold:300,
+ brand:'Astroworld 420',currency:'ZAR',demoMode:true,deliveryFee:45,freeDeliveryThreshold:300,
  ageGate:false,codEnabled:false,whatsappNumber:'',contactEmail:'',collectionAddress:'',
  paymentGateway:'yoco',gatewayEnabled:false,eftEnabled:false,
  recipeNotice:'Recipe, portion volume and allergen details will be confirmed before the store opens. Artwork is illustrative.',

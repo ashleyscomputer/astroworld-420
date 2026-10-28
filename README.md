@@ -1,4 +1,4 @@
-# Astroworld
+# Astroworld 420
 
 A dark, responsive smoothie storefront with a floating-island portal reveal, scroll-driven 3D sculpture, procedural abstract artwork, product tilt and neon glow. Built with the Next.js App Router API on Vinext for Cloudflare Workers, React, Tailwind CSS and Framer Motion. No admin interface.
 
@@ -60,3 +60,7 @@ Desktop and mobile browser checks cover the portal, quick view, half portion, ca
 ## Hosting
 
 `.openai/hosting.json` retains this site's project identity and D1 binding. The Sites workflow packages the exact pushed source and build for private publication. Preserve the hosting manifest and generated schema migrations; credentials and local runtime state remain ignored.
+
+## Supplied brand artwork
+
+`public/astroworld-420-brand.jpg` is the user-supplied Astroworld 420 image. It appears in the scrolling 3D brand panel on Home and Our world, and in Open Graph previews. Header, hero, footer and metadata use the Astroworld 420 name. The image is used as supplied, with layout effects applied in CSS.

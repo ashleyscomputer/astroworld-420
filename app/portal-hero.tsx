@@ -2,6 +2,7 @@
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {useReducedMotion} from 'framer-motion';
 import {ArrowDown,ArrowUpRight,Play} from 'lucide-react';
+import {EarthLetter} from './earth-wordmark';
 
 export function PillHero(){
  const root=useRef<HTMLElement>(null),pill=useRef<HTMLDivElement>(null),row=useRef<HTMLDivElement>(null),video=useRef<HTMLVideoElement>(null),shade=useRef<HTMLDivElement>(null),animations=useRef<Animation[]>([]);
@@ -34,8 +35,8 @@ export function PillHero(){
  return <section ref={root} className="hero pill-hero" aria-label="Astroworld 420 animated island portal">
   <svg className="portal-field" viewBox="0 0 1440 960" preserveAspectRatio="none" aria-hidden="true">{Array.from({length:15},(_,i)=><path key={i} d={`M${i*130-350} 1060 C${i*90-200} 550 ${i*90+150} 400 ${i*120+400} -100`}/>)}</svg>
   <div className="ambient ambient-one"/><div className="ambient ambient-two"/>
-  <div className="hero-heading"><h1 className="sr-only">Astroworld 420 — smoothies</h1><div ref={row} className="hero-wordline portal-wordline">
-   <span className="word-left">ASTRO</span><div ref={pill} className="portal-shell portal-window" data-reveal="waiting"><video ref={video} muted loop playsInline autoPlay={!still} poster="/island-poster.jpg" preload="auto" aria-label="Floating island, moving clouds and a flowing waterfall"><source src="/island.mp4" type="video/mp4"/></video><div className="portal-tint"/><div ref={shade} className="portal-hairline"/></div><span className="word-right">WORLD<sup className="hero-420">420</sup></span>
+  <div className="hero-heading"><h1 className="sr-only">Astroworld 420 — smoothies</h1><div ref={row} className="hero-wordline portal-wordline" aria-hidden="true">
+   <span className="word-left">ASTR<EarthLetter/></span><div ref={pill} className="portal-shell portal-window" data-reveal="waiting"><video ref={video} muted loop playsInline autoPlay={!still} poster="/island-poster.jpg" preload="auto" aria-label="Floating island, moving clouds and a flowing waterfall"><source src="/island.mp4" type="video/mp4"/></video><div className="portal-tint"/><div ref={shade} className="portal-hairline"/></div><span className="word-right">WORLD<sup className="hero-420">420</sup></span>
   </div></div>
   <div className="hero-bottom"><div className="hero-cta"><a href="#collection" className="button primary">Shop the collection<ArrowUpRight size={20}/></a></div><a href="#collection" className="scroll-cue"><span>SCROLL TO EXPLORE</span><span className="scroll-circle"><ArrowDown size={18}/></span></a></div>
   {(still||blocked)&&<button className="portal-play" onClick={()=>{setOverride(true);video.current?.play().then(()=>setBlocked(false)).catch(()=>{});}}><Play size={13}/>{still?'Enable animation':'Play island scene'}</button>}

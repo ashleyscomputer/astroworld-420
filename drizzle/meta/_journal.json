@@ -29,6 +29,20 @@
       "when": 1793176507199,
       "tag": "0003_sticky_shiva",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1793196119321,
+      "tag": "0004_salty_black_knight",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1793250642085,
+      "tag": "0005_square_redwing",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,2 @@
+import {memberIdentity} from '@/lib/members';import {database,json} from '@/lib/server-db';
+export async function GET(request:Request){const member=await memberIdentity(request);if(!member)return json({error:'Please sign in.'},401);const rows=await database().prepare('SELECT a.version,a.document_hash,a.signer_name,a.accepted_at,a.method,v.title,v.body FROM agreement_acceptances a JOIN agreement_versions v ON v.version=a.version WHERE a.member_id=? ORDER BY a.accepted_at DESC').bind(member.id).all();return json({acceptances:rows.results});}

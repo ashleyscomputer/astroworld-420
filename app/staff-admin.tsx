@@ -1,0 +1,11 @@
+'use client';
+import {useEffect,useState} from 'react';
+
+type Staff={username:string;active:number;created_at:string};
+async function staffRequest(method:string,body?:unknown){const r=await fetch('/api/admin/staff',{method,headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const data:any=await r.json();if(!r.ok)throw new Error(data.error||'Unable to update staff.');return data;}
+export function StaffManagement(){
+ const [staff,setStaff]=useState<Staff[]>([]),[username,setUsername]=useState(''),[password,setPassword]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false);
+ const load=async()=>{const data=await staffRequest('GET');setStaff(data.staff);};
+ useEffect(()=>{load().catch(e=>setError(e.message));},[]);
+ return <section className="admin-panel"><h2>Staff access</h2><p>Staff can use the register, orders and memberships.</p><form onSubmit={async e=>{e.preventDefault();setBusy(true);setError('');try{await staffRequest('POST',{username,password});setUsername('');setPassword('');await load();}catch(e){setError(e instanceof Error?e.message:'Unable to create staff account.');}finally{setBusy(false);}}}><label className="form-field"><span>Username</span><input required minLength={3} maxLength={40} pattern="[a-zA-Z0-9._-]+" value={username} onChange={e=>setUsername(e.target.value)}/></label><label className="form-field"><span>Password · 12 characters minimum</span><input type="password" required minLength={12} maxLength={128} autoComplete="new-password" value={password} onChange={e=>setPassword(e.target.value)}/></label><button className="button primary" disabled={busy}>Add staff</button></form>{error&&<p className="error" role="alert">{error}</p>}<div className="member-admin-list">{staff.map(person=><div className="member-admin-row" key={person.username}><div><strong>{person.username}</strong><small>Staff · {person.active?'Active':'Disabled'}</small></div><button className="button secondary" disabled={busy} onClick={async()=>{setBusy(true);setError('');try{await staffRequest('PATCH',{username:person.username,active:!person.active});await load();}catch(e){setError(e instanceof Error?e.message:'Unable to update staff.');}finally{setBusy(false);}}}>{person.active?'Disable':'Enable'}</button></div>)}{!staff.length&&<p>No staff accounts yet.</p>}</div></section>;
+}

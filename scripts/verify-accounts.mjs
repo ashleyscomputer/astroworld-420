@@ -1,0 +1,43 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+
+const base=process.env.TEST_BASE_URL||'http://127.0.0.1:3001';
+if(!['localhost','127.0.0.1'].includes(new URL(base).hostname))throw new Error('Use an isolated local database.');
+const agreement=JSON.parse(await readFile(new URL('../lib/signup-agreement.json',import.meta.url),'utf8'));
+const acceptance={version:agreement.version,hash:agreement.hash,accepted:true,ageConfirmed:true};
+const account={action:'register',name:'Account QA',email:`account-${crypto.randomUUID()}@example.invalid`,phone:'0820000000',password:'isolated-test-password-420',acceptance};
+async function req(path,method='GET',body,cookie='',status=200,origin=base){
+ const response=await fetch(base+path,{method,headers:{Origin:origin,'Content-Type':'application/json',...(cookie?{Cookie:cookie}:{})},...(body?{body:JSON.stringify(body)}:{})});
+ const data=await response.json();assert.equal(response.status,status,`${path}: ${JSON.stringify(data)}`);return {response,data};
+}
+const cookieFor=(response,name)=>response.headers.getSetCookie().find(c=>c.startsWith(name+'=')).split(';')[0];
+assert.equal(createHash('sha256').update(agreement.paragraphs.join('\n')).digest('hex'),agreement.hash);
+await req('/api/member/agreement','GET',undefined,'',401);
+await req('/api/member','POST',{...account,acceptance:undefined},'',400);
+await req('/api/member','POST',{...account,acceptance:{...acceptance,accepted:false}},'',400);
+await req('/api/member','POST',{...account,acceptance:{...acceptance,ageConfirmed:false}},'',400);
+await req('/api/member','POST',{...account,acceptance:{...acceptance,version:'outdated'}},'',400);
+await req('/api/member','POST',account,'',400,'https://untrusted.invalid');
+const created=await req('/api/member','POST',{...account,role:'super_admin'}),memberCookie=cookieFor(created.response,'aw_member');
+assert.match(created.response.headers.getSetCookie().join('\n'),/HttpOnly/);
+assert.match(created.response.headers.getSetCookie().join('\n'),/SameSite=Strict/);
+assert.match(cookieFor(created.response,'aw_admin'),/^aw_admin=$/);
+let receipts=(await req('/api/member/agreement','GET',undefined,memberCookie)).data.acceptances;
+assert.equal(receipts.length,1);assert.equal(receipts[0].document_hash,agreement.hash);assert.equal(receipts[0].signer_name,account.name);assert.equal(receipts[0].body,agreement.paragraphs.join('\n'));assert.ok(Date.parse(receipts[0].accepted_at));
+await req('/api/admin/staff','GET',undefined,memberCookie,401);
+const who=(await req('/api/auth/session','GET',undefined,memberCookie)).data;assert.equal(who.account.role,'customer');assert.equal(who.redirect,'/member');
+await req('/api/member','POST',account,'',400);
+assert.equal((await req('/api/member/agreement','GET',undefined,memberCookie)).data.acceptances.length,1);
+const other=await req('/api/member','POST',{...account,name:'Other QA',email:`other-${crypto.randomUUID()}@example.invalid`});
+receipts=(await req('/api/member/agreement','GET',undefined,cookieFor(other.response,'aw_member'))).data.acceptances;assert.equal(receipts.length,1);assert.equal(receipts[0].signer_name,'Other QA');
+await req('/api/auth/session','POST',{identifier:account.email,password:'wrong'},'',401);
+const login=await req('/api/auth/session','POST',{identifier:account.email,password:account.password});assert.equal(login.data.redirect,'/member');
+const signedIn=cookieFor(login.response,'aw_member');await req('/api/auth/session','DELETE',undefined,signedIn);assert.equal((await req('/api/auth/session','GET',undefined,signedIn)).data.account,null);
+const admin=await req('/api/auth/session','POST',{identifier:'admin',password:'admin'});assert.equal(admin.data.redirect,'/admin');assert.match(cookieFor(admin.response,'aw_member'),/^aw_member=$/);
+assert.equal((await req('/api/auth/session','GET',undefined,cookieFor(admin.response,'aw_admin'))).data.account.role,'super_admin');
+await req('/api/auth/session','POST',{identifier:'admin',password:'admin'},'',401,'https://untrusted.invalid');
+const document=await fetch(base+agreement.download);assert.equal(document.status,200);assert.ok((await document.arrayBuffer()).byteLength>1000);
+const page=await fetch(base+'/login');assert.equal(page.status,200);assert.match(await page.text(),/Welcome back/);
+await req('/api/member/firebase','POST',{idToken:'invalid',acceptance},'',400);
+console.log('PASS: shared login, server-assigned roles, cookie isolation, CSRF, agreement validation, atomic signup, immutable receipt, member privacy, logout and agreement download.');

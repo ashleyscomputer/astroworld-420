@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict';
+import {membershipExpiry} from '../lib/membership-time.ts';
+const base=process.env.TEST_BASE_URL||'http://127.0.0.1:3001';
+if(!['127.0.0.1','localhost'].includes(new URL(base).hostname)||new URL(base).port!=='3001')throw new Error('Use the isolated local test database on port 3001.');
+async function req(path,method='GET',body,cookie='',status=200){const response=await fetch(base+path,{method,headers:{Origin:base,'Content-Type':'application/json',...(cookie?{Cookie:cookie}:{})},...(body?{body:JSON.stringify(body)}:{})});const data=await response.json();assert.equal(response.status,status,`${path}: ${JSON.stringify(data)}`);return {data,response};}
+const admin=(await req('/api/admin/session','POST',{username:'admin',password:'admin'})).response.headers.get('set-cookie').split(';')[0];
+const username='staff'+crypto.randomUUID().slice(0,8),password='temporary-test-password';
+await req('/api/admin/staff','POST',{username,password},admin,201);
+const staff=(await req('/api/admin/session','POST',{username,password})).response.headers.get('set-cookie').split(';')[0];
+assert.equal((await req('/api/admin/session','GET',undefined,staff)).data.user.role,'staff');
+const board=(await req('/api/admin','GET',undefined,staff)).data;assert.equal(board.inventory[0].cost,null);assert.equal(board.metrics.profit,undefined);assert.ok(board.orders.every(o=>o.cost===null&&o.profit===null));
+await req('/api/admin/staff','GET',undefined,staff,403);
+await req('/api/admin/staff','POST',{username:'attack',password},staff,403);
+await req('/api/admin/inventory','PATCH',{productId:'banana',stock:100,cost:20,revision:0},staff,403);
+const order=(await req('/api/admin/orders','POST',{requestId:crypto.randomUUID(),items:[{productId:'banana',size:'half',quantity:1}],customer:{name:'Staff test',email:'staff-test@example.invalid',phone:'0820000000'},method:'collection',terms:true,privacy:true,payment:'preview'},staff,201)).data;
+await req('/api/admin/orders','PATCH',{id:order.id,action:'mark_paid',revision:0},staff,403);
+await req('/api/quote','POST',{items:[{productId:'banana',size:'full',quantity:1}],method:'courier'},'',400);
+await req('/api/admin/staff','PATCH',{username,active:false},admin);
+await req('/api/admin','GET',undefined,staff,401);
+await req('/api/admin/session','POST',{username,password},'',401);
+await req('/api/admin/staff','PATCH',{username,active:true},admin);
+await req('/api/admin/session','POST',{username,password});
+assert.equal(membershipExpiry(new Date('2026-01-31T12:00:00Z'),'monthly').toISOString(),'2026-02-28T12:00:00.000Z');
+assert.equal(membershipExpiry(new Date('2026-01-31T12:00:00Z'),'day').toISOString(),'2026-02-01T12:00:00.000Z');
+console.log('PASS: staff permissions, revocation, collection-only quotes and membership expiry.');

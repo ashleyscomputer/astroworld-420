@@ -1,0 +1,8 @@
+.rgb-easter-egg{position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;max-width:100%;padding:12px 24px;border:1px solid transparent;border-radius:999px;color:#f3f7ff;background:#0b1222;font-size:14px;font-weight:600;line-height:1.35;text-align:center;text-decoration:none;white-space:normal;box-shadow:0 0 18px #4a9cff30;transition:transform .2s ease,box-shadow .2s ease}
+.rgb-easter-egg:before{content:'';position:absolute;inset:-2px;z-index:-2;border-radius:inherit;background:linear-gradient(100deg,#48c9ff,#526fff,#c474ff,#69e9ff,#48c9ff);background-size:300% 100%;animation:easter-egg-glow 5s linear infinite}
+.rgb-easter-egg:after{content:'';position:absolute;inset:1px;z-index:-1;border-radius:inherit;background:linear-gradient(135deg,#14213b,#090f1d)}
+.rgb-easter-egg:hover{transform:translateY(-2px);color:#fff;box-shadow:0 0 24px #48bfff66,0 0 45px #9766ff30}
+.rgb-easter-egg:focus-visible{outline:2px solid #b9ecff;outline-offset:5px;box-shadow:0 0 24px #48bfff66}
+.checkout-easter-egg{margin:20px 0 28px}.empty-state .checkout-easter-egg{margin-bottom:0}
+@keyframes easter-egg-glow{to{background-position:300% 0}}
+@media(prefers-reduced-motion:reduce){.rgb-easter-egg,.rgb-easter-egg:hover{transition:none;transform:none}.rgb-easter-egg:before{animation:none}}

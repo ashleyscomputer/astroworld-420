@@ -51,3 +51,16 @@ body{background:radial-gradient(ellipse at 8% 12%,#123e7133,transparent 38%),rad
 @media(max-width:1050px){.newsletter.section-wrap{padding:38px;gap:5%}.newsletter-spark{font-size:48px;right:4px;top:76px}.newsletter-field{flex-wrap:wrap}.newsletter-field button{width:100%}.newsletter form{padding:22px}}
 @media(max-width:640px){.newsletter.section-wrap{grid-template-columns:1fr;width:calc(100% - 32px);margin:32px auto 48px;padding:30px 20px;gap:28px;border-radius:22px}.newsletter h2{font-size:52px;margin-top:20px}.newsletter-spark{font-size:60px;right:8px;top:54px}.newsletter-copy>p{font-size:15px}.newsletter form{padding:20px}.newsletter form>p{font-size:20px}.newsletter-field button{min-height:48px}.newsletter .checkbox.small{font-size:13px}.newsletter .eyebrow{font-size:9px;letter-spacing:.08em}}
 @media(prefers-reduced-motion:reduce){.newsletter-field,.newsletter-field button{transition:none}.newsletter-field button:hover:not(:disabled){transform:none}}
+
+/* Animated border treatment adapted to the site's blue palette. */
+.site-header{isolation:isolate}
+.site-header:before,.site-header:after{content:'';position:absolute;pointer-events:none;background:linear-gradient(100deg,#237aff,#67d9ff,#caefff,#2677f2,#54caff,#237aff);background-size:400% 100%;animation:header-border-drift 14s linear infinite}
+.site-header:before{inset:0;padding:1px;border-radius:inherit;z-index:1;-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.8}
+.site-header:after{bottom:-2px;left:8%;right:8%;height:3px;filter:blur(7px);opacity:.55;z-index:-1}
+@keyframes header-border-drift{0%,100%{background-position:0 0}50%{background-position:400% 0}}
+.story-copy h1{font-size:clamp(42px,5vw,74px);line-height:1.02;letter-spacing:-.055em;margin:24px 0 28px}.story-copy h1 em{color:#abdfff;text-shadow:0 0 30px #55b9ff35}
+.story-copy h2{line-height:1.05}.story-copy p{font-size:15px;line-height:1.8;color:#bdd1e8;max-width:460px}.story-copy .text-link{font-size:13px}
+.about-story{min-height:calc(100svh - 88px);padding-top:60px;padding-bottom:60px}.about-story .brand-visual{max-height:600px}.about-story .visual-caption{font-size:10px;color:#d6eaff}
+@media(min-width:761px) and (max-width:1250px){.site-header{height:auto;min-height:112px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:64px 48px;gap:0}.main-nav,.main-nav.is-open{grid-column:1/-1;grid-row:2;position:static;display:flex;flex-direction:row;align-items:center;gap:24px;overflow-x:auto;scrollbar-width:none;white-space:nowrap;height:48px;margin:0 calc(-1 * var(--space));padding:0 var(--space);background:none;border:0}.main-nav a,.main-nav a:last-child{display:block;flex:0 0 auto;font-size:12px}.pill-hero{height:calc(100svh - 112px)}.joint-stage{top:112px;height:calc(100svh - 112px)}}
+@media(max-width:760px){.about-story{padding-top:38px;padding-bottom:48px;gap:32px}.story-copy h1{font-size:48px;margin:18px 0 24px}.story-copy p{font-size:15px}}
+@media(prefers-reduced-motion:reduce){.site-header:before,.site-header:after{animation:none}}

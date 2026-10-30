@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {products,calculate,provinces,settings,type CartItem} from './catalog';
+import {products,calculate,provinces,settings,type CartItem,type Product} from './catalog';
 import {database} from './server-db';
 export async function ensureInventory(){
  const db=database(),now=new Date().toISOString();
@@ -13,7 +13,7 @@ export async function currentProducts(includeInactive=false){
  return rows.results.map((r:any)=>{
   const fallback=products.find(p=>p.id===r.id);
   const image=r.image_url||fallback?.image||'/astroworld-official-logo.jpeg';
-  const product:Product={id:r.id,slug:r.slug,name:r.name,price:r.price_cents/100,tiers:[r.price_cents/100,r.second_gram_cents/100,r.third_gram_cents/100],glowColor:r.glow_color,accent:r.accent,shortDescription:r.short_description,longDescription:r.long_description,stock:r.half_units/2,number:r.product_number,image,imagePosition:r.image_url?'50% 50%':fallback?.imagePosition,active:Boolean(r.active),productRevision:r.revision??0,imageRevision:r.image_revision??0};
+  const product:Product={id:r.id,slug:r.slug,name:r.name,price:r.price_cents/100,tiers:[r.price_cents/100,r.second_gram_cents/100,r.third_gram_cents/100],glowColor:r.glow_color,accent:r.accent,shortDescription:r.short_description,longDescription:r.long_description,stock:r.half_units/2,number:r.product_number,image,imagePosition:r.image_url&&r.image_url!==fallback?.image?'50% 50%':fallback?.imagePosition,active:Boolean(r.active),productRevision:r.revision??0,imageRevision:r.image_revision??0};
   return includeInactive?{...product,cost:r.cost_cents==null?null:r.cost_cents/100,revision:r.inventory_revision??0}:product;
  });
 }

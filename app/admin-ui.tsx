@@ -7,7 +7,7 @@ import {PosRegister} from './pos-register';
 import {ProductMedia} from './product-media';
 import {ProductImage} from './storefront';
 import {UniversalAuth} from './universal-auth';
-import {Mark} from './storefront';import {money,products} from '@/lib/catalog';
+import {Mark} from './storefront';import {money} from '@/lib/catalog';
 async function api(path:string,method='GET',body?:unknown){const r=await fetch(path,{method,headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const d:any=await r.json();if(!r.ok){if(r.status===401&&path!=='/api/admin/session')window.location.reload();throw new Error(d.error||'Please try again.');}return d;}
 const stateLabel=(value:string)=>({preview:'Legacy preview',pending:'New',confirmed:'Confirmed',preparing:'Preparing',ready:'Ready',shipped:'Shipped',completed:'Completed',cancelled:'Cancelled',refunded:'Refund recorded'}[value]||value);
 export function AdminPage(){const [user,setUser]=useState<string|null>(null),[role,setRole]=useState<'super_admin'|'staff'>('staff'),[checking,setChecking]=useState(true),[data,setData]=useState<any>(null),[tab,setTab]=useState('pos'),[error,setError]=useState(''),[message,setMessage]=useState(''),[loading,setLoading]=useState(false),[selected,setSelected]=useState<string|null>(null),[search,setSearch]=useState(''),[busy,setBusy]=useState(false),[orderFilter,setOrderFilter]=useState('all'),[registerVersion,setRegisterVersion]=useState(0),[productEdit,setProductEdit]=useState<any|null>(null);

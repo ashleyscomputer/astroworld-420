@@ -1,6 +1,6 @@
 /* Final site palette: deep navy, electric blue and icy cyan. */
-:root{--bg:#050c1b;--panel:#0b1b32;--ink:#eff7ff;--muted:#a8bed7;--line:#8fcaff2b;--acid:#56eef4;--purple:#75baff;--cosmic-pink:#70c8ff;--cosmic-cyan:#56eef4;--cosmic-violet:#78b7ff;--premium-black:#050c1b;--premium-purple:#75baff;--premium-pink:#89d9ff;--premium-green:#56eef4}
-body{background:radial-gradient(ellipse at 8% 12%,#123e7133,transparent 38%),radial-gradient(ellipse at 95% 45%,#10498b26,transparent 40%),var(--bg);color:var(--ink)}
+:root{--bg:#030a17;--panel:#081a31;--ink:#eff8ff;--muted:#a8c2dc;--line:#8fcaff2b;--acid:#56eef4;--purple:#75baff;--cosmic-pink:#70c8ff;--cosmic-cyan:#56eef4;--cosmic-violet:#78b7ff;--premium-black:#030a17;--premium-purple:#75baff;--premium-pink:#89d9ff;--premium-green:#56eef4}
+body{background:radial-gradient(ellipse at 14% 12%,#1766a944,transparent 42%),radial-gradient(ellipse at 86% 30%,#087d9a2b,transparent 39%),radial-gradient(ellipse at 54% 100%,#263d9140,transparent 48%),linear-gradient(135deg,#030815 0%,#06162b 48%,#030a18 100%);color:var(--ink)}
 .site-header{background:linear-gradient(110deg,#07172cef,#071326f2 60%,#0c2340f0);border-bottom-color:#82c9ff38;box-shadow:0 8px 32px #0005,0 1px 22px #3b9aff18}
 .nav-brand-logo{box-shadow:0 0 16px #65baff45}.brand-420{color:#b7eaff;background:#4bafff17;border-color:#87d7ff66}
 .main-nav a{color:#c6d8ed}.main-nav a.active:before{background:#95e1ff;box-shadow:0 0 12px #67c8ff}
@@ -121,3 +121,32 @@ a:hover,.text-link:hover{color:var(--acid)}
 .about-wordmark iframe{display:block;flex:0 0 clamp(48px,6vw,82px);width:clamp(48px,6vw,82px);height:clamp(58px,7.5vw,96px);border:0;background:transparent;overflow:hidden}
 @media(max-width:760px){.astroworld-motion-logo{min-height:260px}.about-wordmark{font-size:clamp(27px,8vw,42px);margin-top:24px}}
 @media(prefers-reduced-motion:reduce){.astroworld-motion-logo,.about-wordmark iframe{animation:none}}
+
+
+/* One shared, transparent cosmic environment behind the site and logo embeds. */
+.cosmic-sky{z-index:0;isolation:isolate}
+.cosmic-sky:before{content:"";position:absolute;inset:-16%;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 18% 22%,#247bca36,transparent 34%),radial-gradient(ellipse at 79% 34%,#05b8c82a,transparent 31%),radial-gradient(ellipse at 53% 88%,#4a55c52b,transparent 38%);filter:blur(22px);animation:cosmic-nebula-drift 38s ease-in-out infinite alternate}
+.cosmic-stars{opacity:.68;background-image:radial-gradient(1px 1px at 5% 13%,#e9fbff 96%,transparent),radial-gradient(1.5px 1.5px at 18% 61%,#9eefff 96%,transparent),radial-gradient(1px 1px at 29% 28%,#fff 96%,transparent),radial-gradient(1px 1px at 43% 82%,#9ecbff 96%,transparent),radial-gradient(1.5px 1.5px at 57% 17%,#dffaff 96%,transparent),radial-gradient(1px 1px at 68% 69%,#fff 96%,transparent),radial-gradient(1px 1px at 79% 11%,#b8f7ff 96%,transparent),radial-gradient(1.5px 1.5px at 93% 48%,#d5eaff 96%,transparent);background-size:480px 390px;animation:cosmic-twinkle 8s ease-in-out infinite alternate,cosmic-star-drift 130s linear infinite;filter:drop-shadow(0 0 3px #59cfff45)}
+.cosmic-stars:before,.cosmic-stars:after{content:"";position:absolute;inset:0;pointer-events:none;background-repeat:repeat}
+.cosmic-stars:before{opacity:.6;background-image:radial-gradient(1px 1px at 11% 32%,#fff 96%,transparent),radial-gradient(1px 1px at 36% 6%,#bdeaff 96%,transparent),radial-gradient(1.5px 1.5px at 62% 51%,#d7fbff 96%,transparent),radial-gradient(1px 1px at 91% 88%,#fff 96%,transparent);background-size:310px 270px;animation:cosmic-twinkle 5.5s ease-in-out infinite alternate-reverse}
+.cosmic-stars:after{opacity:.28;background-image:radial-gradient(2px 2px at 24% 72%,#8edbff 96%,transparent),radial-gradient(2px 2px at 76% 24%,#d9faff 96%,transparent);background-size:620px 530px;animation:cosmic-twinkle 12s ease-in-out infinite alternate}
+.cosmic-stars-far{opacity:.2;background-size:720px 610px;background-position:170px 90px;animation-duration:16s,190s}
+.cosmic-shooting-star{width:150px;height:1px;background:linear-gradient(90deg,transparent,#56eef4,#e8fdff);filter:drop-shadow(0 0 7px #56eef4);animation:cosmic-shoot 17s linear infinite}
+.cosmic-shooting-star:nth-of-type(2){top:22%;animation-delay:5s;animation-duration:20s}
+.cosmic-shooting-star:nth-of-type(3){top:41%;animation-delay:11s;animation-duration:24s}
+.cosmic-shooting-star:nth-of-type(4){top:8%;animation-delay:17s;animation-duration:27s}
+.cosmic-shooting-star:nth-of-type(5){top:67%;animation-delay:23s;animation-duration:30s}
+@keyframes cosmic-nebula-drift{0%{transform:translate3d(-2%,-1%,0) scale(.98)}100%{transform:translate3d(2%,1.5%,0) scale(1.05)}}
+@keyframes cosmic-star-drift{0%{background-position:0 0}100%{background-position:480px 390px}}
+@keyframes cosmic-shoot{0%,76%{opacity:0;transform:translate3d(0,0,0) rotate(18deg)}78%{opacity:.85}87%{opacity:0;transform:translate3d(120vw,25vh,0) rotate(18deg)}100%{opacity:0;transform:translate3d(120vw,25vh,0) rotate(18deg)}}
+
+/* The artwork now floats in the same space as the rest of the storefront. */
+.story-visual.brand-visual{background:radial-gradient(ellipse at 50% 48%,#0a37602e,transparent 70%);border-color:transparent;box-shadow:none;overflow:visible}
+.story-visual.brand-visual .story-grid{opacity:.035;mask-image:radial-gradient(ellipse at center,#000 8%,transparent 76%)}
+.story-visual.brand-visual .brand-artwork{inset:0}
+.astroworld-motion-logo{background:transparent!important;border-radius:0}
+.about-wordmark iframe{background:transparent!important}
+@media(prefers-reduced-motion:reduce){
+ .cosmic-sky:before,.cosmic-stars,.cosmic-stars:before,.cosmic-stars:after,.cosmic-shooting-star{animation:none!important}
+ .cosmic-sky:before{opacity:.7}
+}

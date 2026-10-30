@@ -1,4 +1,4 @@
-export type Product = { id:string; slug:string; name:string; price:number; tiers:[number,number,number]; glowColor:string; accent:string; shortDescription:string; longDescription:string; stock:number; number:string; image:string; imagePosition?:string };
+export type Product = { id:string; slug:string; name:string; price:number; tiers:[number,number,number]; glowColor:string; accent:string; shortDescription:string; longDescription:string; stock:number; number:string; image:string; imagePosition?:string; active?:boolean; productRevision?:number; imageRevision?:number; revision?:number; cost?:number|null };
 const tierRates:Record<string,[number,number,number]>={'super-berry':[30,20,20],'white-cheese':[70,60,60],banana:[70,60,60],atomic:[100,90,80],caramel:[130,120,110],rack:[140,130,120],sunset:[150,140,130],cheese:[160,150,140]};
 const productIds=['super-berry','white-cheese','banana','atomic','caramel','rack','sunset','cheese'];
 const catalog = [
@@ -11,7 +11,7 @@ const catalog = [
  ['Sunset Sherbet',150,'#ffa27e','#ea5cba','Catch a feeling. Chase the glow.',20],
  ['Indoor Cheese',160,'#ffc875','#ff854d','Smooth by nature. Bold by design.',18],
 ];
-export const products:Product[] = catalog.map((p,i)=>{const name=String(p[0]);const slug=productIds[i];return {id:slug,slug,name,price:Number(p[1]),tiers:tierRates[slug],glowColor:String(p[2]),accent:String(p[3]),shortDescription:String(p[4]),longDescription:`${p[4]} Meet ${name}, one of eight Astroworld 420 products. Product images are AI-generated placeholders. Choose 1 g or 0.5 g.`,stock:0,number:String(i+1).padStart(2,'0'),image:'/art/buds-placeholder-sheet.png',imagePosition:`${(i%4)*100/3}% ${Math.floor(i/4)*100}%`};});
+export const products:Product[] = catalog.map((p,i)=>{const name=String(p[0]);const slug=productIds[i];return {id:slug,slug,name,price:Number(p[1]),tiers:tierRates[slug],glowColor:String(p[2]),accent:String(p[3]),shortDescription:String(p[4]),longDescription:`${p[4]} Meet ${name}, one of eight Astroworld 420 products. Product images are AI-generated placeholders. Choose 1 g or 0.5 g.`,stock:0,number:String(i+1).padStart(2,'0'),active:true,image:'/art/buds-placeholder-sheet.png',imagePosition:`${(i%4)*100/3}% ${Math.floor(i/4)*100}%`};});
 export const settings = {
  brand:'Astroworld 420',currency:'ZAR',demoMode:true,deliveryFee:45,freeDeliveryThreshold:300,
  ageGate:false,codEnabled:false,whatsappNumber:'',contactEmail:'',collectionAddress:'',

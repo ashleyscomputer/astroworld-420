@@ -16,8 +16,8 @@ export const metadata: Metadata = {
   metadataBase:new URL('https://astroworld-smoothie-orbit.maritzliam.chatgpt.site'),
   openGraph:{title:'ASTROWORLD 420 — Enter another world.',description:'Eight originals. Infinite good energy. Explore the Astroworld 420 collection.',images:[{url:'/astroworld-420-brand.jpg',width:1254,height:1254,alt:'Astroworld 420 — Wish you were here'}],type:'website'},
   icons: {
-    icon: "/astroworld-official-logo.jpeg",
-    shortcut: "/astroworld-official-logo.jpeg",
+    icon: "/astroworld420-favicon.svg",
+    shortcut: "/astroworld420-favicon.svg",
   },
 };
 
@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body><div className="cosmic-sky" aria-hidden="true"><div className="cosmic-stars"/><div className="cosmic-stars cosmic-stars-far"/><span className="cosmic-shooting-star"/><span className="cosmic-shooting-star"/><span className="cosmic-shooting-star"/><span className="cosmic-shooting-star"/><span className="cosmic-shooting-star"/></div><StoreProvider><a className="skip-link" href="#main">Skip to content</a><Header/>{children}<Footer/></StoreProvider></body>
+      <body><StoreProvider><a className="skip-link" href="#main">Skip to content</a><Header/>{children}<Footer/></StoreProvider></body>
     </html>
   );
 }

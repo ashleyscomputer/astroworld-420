@@ -79,7 +79,7 @@ a:hover,.text-link:hover{color:var(--acid)}
 .nav-brand-logo{width:46px;height:46px;border-radius:50%;box-shadow:0 0 18px #56eef43d}
 .site-header .brand,.footer-top>.brand{gap:10px}
 .story-logo-frame{position:absolute;inset:0;width:100%;height:100%;border:0}
-.hero-heading{position:absolute;inset:0;display:grid;place-items:center;width:100%}
+.hero-heading{position:absolute;inset:0;display:grid;place-items:center;width:100%;transform:none;text-align:center}
 .hero-logo-frame{width:min(78vw,660px);height:min(78vw,660px);border:0;filter:drop-shadow(0 0 26px #56eef424)}
 .hero-bottom{justify-content:center}
 .hero-cta{margin-left:0}
@@ -91,7 +91,7 @@ a:hover,.text-link:hover{color:var(--acid)}
 .joint-contact-link:hover{transform:translateY(-3px);filter:drop-shadow(0 0 12px #56eef48a)}
 .footer-top>div .social-icon{position:relative;display:grid;place-items:center;width:46px;height:46px;border:1px solid transparent;border-radius:50%;overflow:hidden;transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s ease,filter .28s ease}
 .footer-top>div .social-icon:before{content:"";position:absolute;inset:0;border-radius:inherit;opacity:1;transition:filter .28s ease,transform .28s ease}
-.footer-top>div .social-icon svg,.footer-top>div .social-icon .whatsapp-icon{position:relative;z-index:1}
+.footer-top>div .social-icon:before{z-index:0}.footer-top>div .social-icon svg,.footer-top>div .social-icon .whatsapp-icon{position:relative;z-index:1}
 .footer-top>div .social-icon:hover,.footer-top>div .social-icon:focus-visible{transform:translateY(-4px) scale(1.08);box-shadow:0 0 24px #56eef455;filter:saturate(1.18)}
 .footer-top>div .social-icon:hover:before{transform:scale(1.08);filter:brightness(1.12)}
 .social-instagram:before{background:linear-gradient(45deg,#feda75 0%,#fa7e1e 24%,#d62976 52%,#962fbf 76%,#4f5bd5 100%)}

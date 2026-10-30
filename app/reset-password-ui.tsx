@@ -1,9 +1,9 @@
 'use client';
-import {useState} from 'react';
+import {useState,type FormEvent} from 'react';
 import {ArrowRight,CheckCircle2} from 'lucide-react';
 export function ResetPassword(){
  const [password,setPassword]=useState(''),[confirm,setConfirm]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[success,setSuccess]=useState(false);
- const submit=async(e:React.FormEvent<HTMLFormElement>)=>{
+ const submit=async(e:FormEvent<HTMLFormElement>)=>{
   e.preventDefault();if(busy)return;setError('');
   if(password.length<12){setError('Use at least 12 characters.');return;}
   if(password!==confirm){setError('The passwords do not match.');return;}

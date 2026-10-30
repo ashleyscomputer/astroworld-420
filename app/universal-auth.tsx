@@ -11,7 +11,7 @@ export function UniversalAuth(){
  const signup=mode==='signup';
  const acceptance={version:agreement.version,hash:agreement.hash,accepted,ageConfirmed:age};
  const resetState=(next:Mode)=>{setMode(next);setPassword('');setError('');setNotice('');};
- const validate=()=>{if(signup){if(name.trim().length<2||!/^\+?[\d\s()-]{9,18}$/.test(phone))return 'Enter your full name and phone number.';if(!accepted||!age)return 'Confirm your age and accept the agreement first.';}if((mode==='forgot'||signup)&&!/^\S+@\S+\.\S+$/.test(identifier.trim()))return 'Enter a valid email address.';return null;};
+ const validate=()=>{if(signup){if(name.trim().length<2||!/^\\+?[\\d\\s()-]{9,18}$/.test(phone.trim())||phone.replace(/\\D/g,'').length<9||phone.replace(/\\D/g,'').length>15)return 'Enter your full name and a valid phone number.';if(!accepted||!age)return 'Confirm your age and accept the agreement first.';}if((mode==='forgot'||signup)&&!/^\\S+@\\S+\\.\\S+$/.test(identifier.trim()))return 'Enter a valid email address.';return null;};
  const resend=async()=>{
   if(!identifier.includes('@')){setError('Enter the email address used to create your account.');return;}
   setBusy(true);setError('');setNotice('');

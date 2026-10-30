@@ -16,9 +16,9 @@ export async function memberIdentity(request:Request){
 }
 export async function createMemberSession(memberId:string,duration=604800000){const value=token(),now=Date.now(),db=database();await db.batch([db.prepare('DELETE FROM member_sessions WHERE expires<?').bind(now),db.prepare('INSERT INTO member_sessions(hash,member_id,expires) VALUES(?,?,?)').bind(await digest(value),memberId,now+duration)]);return value;}
 export async function register(request:Request,name:string,email:string,phone:string,password:string,acceptance:unknown){
- sameOrigin(request);acceptanceSchema.parse(acceptance);const normalized=email.trim().toLowerCase();await authRateLimit(request,'member-register',normalized,10);
+ sameOrigin(request);acceptanceSchema.parse(acceptance);const normalized=email.trim().toLowerCase(),normalizedPhone=phone.trim(),phoneDigits=normalizedPhone.replace(/\\D/g,'').length;if(phoneDigits<9||phoneDigits>15)throw new Error('Enter a valid phone number with 9 to 15 digits.');await authRateLimit(request,'member-register',normalized,10);
  const db=database(),salt=token(),id=crypto.randomUUID(),createdAt=new Date().toISOString();
- try{await db.batch([db.prepare('INSERT INTO members(id,email,name,phone,salt,password_hash,status,created_at,email_verified_at) VALUES(?,?,?,?,?,?,?,?,NULL)').bind(id,normalized,name.trim(),phone.trim(),salt,await hashPassword(password,salt),'pending',createdAt),...agreementStatements(id,name.trim(),acceptance)]);}
+ try{await db.batch([db.prepare('INSERT INTO members(id,email,name,phone,salt,password_hash,status,created_at,email_verified_at) VALUES(?,?,?,?,?,?,?,?,NULL)').bind(id,normalized,name.trim(),normalizedPhone,salt,await hashPassword(password,salt),'pending',createdAt),...agreementStatements(id,name.trim(),acceptance)]);}
  catch(e){if(String(e).includes('UNIQUE'))throw new Error('An account already exists for that email. Sign in or request another verification email.');throw e;}
  await requestEmailVerification(request,normalized);
 }

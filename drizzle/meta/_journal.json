@@ -50,6 +50,13 @@
       "when": 1793336000000,
       "tag": "0006_admin_product_catalog",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1793342400000,
+      "tag": "0007_member_email_auth",
+      "breakpoints": true
     }
   ]
 }

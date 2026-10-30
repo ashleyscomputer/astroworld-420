@@ -36,6 +36,29 @@ The hero uses the supplied island video, revealing from a line through a circle 
 
 - `public/astroworld-420-brand.jpg`: user artwork, used as supplied with CSS layout effects.
 
+## D1 environments and migrations
+
+Three D1 environments are kept separate:
+
+- Local: Wrangler's local persistent D1 state under `.wrangler/state`. The local launcher seeds demo inventory here only.
+- Release preview: `astroworld-420-release-preview`. Apply the committed Drizzle migrations here before testing a release.
+- Production: `astroworld-420-production`. Keep it empty until the preview build, schema, auth flows and operational checks have passed.
+
+After pulling the branch and installing dependencies, build the Worker configuration before applying remote migrations:
+
+```powershell
+npm run build
+npm run db:migrate:preview
+```
+
+After successful preview migration and full regression testing, apply production migrations as a separate, deliberate release step:
+
+```powershell
+npm run db:migrate:production
+```
+
+These commands use Wrangler's D1 migration runner against the named remote database; they do not copy local demo records or seed inventory. Never use `--local` or the local demo launcher to target production. Do not deploy the production Worker until the production migration command reports success and its schema has been checked.
+
 ## Account verification and password recovery
 
 Customer registration requires a full name, email address, phone number, a 12-character minimum password, age confirmation and acceptance of the current agreement. New member accounts cannot sign in or receive an active QR pass until their email address is verified. Verification links are single-use and expire after 24 hours. Membership approval remains a separate staff action.

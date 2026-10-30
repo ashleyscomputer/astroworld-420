@@ -23,9 +23,4 @@
 .product-media{display:block;position:relative;overflow:hidden;background-repeat:no-repeat;background-color:#0d1320;border-radius:inherit;isolation:isolate}
 .product-media>img{display:block;width:100%;height:100%;object-fit:cover}.product-media.bud-art{width:100%;height:100%;border-radius:0}
 .bag-line>a>.product-media{width:100px;height:100px}.summary-line>.product-media{width:55px;height:55px;flex:none;border-radius:8px}.inventory-card-top>.product-media{width:60px;height:60px;flex:none;border-radius:10px}
-.cosmic-stars{background-size:260px 245px;animation-duration:5s}.cosmic-stars-far{background-size:390px 350px;animation-duration:8s}
-.cosmic-shooting-star{width:150px;height:2px;animation:cosmic-shoot-vivid 5.5s linear infinite;filter:drop-shadow(0 0 6px #7bd0ff)}
-.cosmic-shooting-star:nth-of-type(2){top:25%;animation-delay:-2s;animation-duration:7s}.cosmic-shooting-star:nth-of-type(3){top:40%;animation-delay:-4s;animation-duration:6s}.cosmic-shooting-star:nth-of-type(4){top:5%;animation-delay:-3s;animation-duration:8.5s}.cosmic-shooting-star:nth-of-type(5){top:58%;animation-delay:-6s;animation-duration:9s}
 @keyframes cosmic-shoot-vivid{0%{opacity:0;transform:translate(-10vw,-5vh) rotate(18deg)}2%{opacity:.95}20%{opacity:.8}25%,100%{opacity:0;transform:translate(130vw,35vh) rotate(18deg)}}
-@media(max-width:600px){.auth-page{padding:32px 12px}.auth-page>.universal-auth{padding:24px 18px;border-radius:18px}.account-modal .modal-content{padding:38px 20px 24px}.cosmic-shooting-star{width:90px}.bag-line>a>.product-media{width:74px;height:84px}}
-@media(prefers-reduced-motion:reduce){.cosmic-stars{animation:none}.cosmic-shooting-star{display:none}}

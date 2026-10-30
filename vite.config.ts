@@ -7,7 +7,7 @@ import { sites } from "./scripts/vite/sites-vite-plugin";
 import { connectorPreview } from "./scripts/vite/connector-preview-plugin.mjs";
 
 const PRODUCTION_D1_DATABASE_ID = "1d469d57-f7f9-4e90-b7f9-3c45deb3d1a6";
-const PREVIEW_D1_DATABASE_ID = "6228a55e-925a-4838-affc-9fc58c25a193";
+const PREVIEW_D1_DATABASE_ID = "908ed519-2d90-4234-a604-639cf226c7d9";
 
 const { d1, r2 } = hostingConfig;
 

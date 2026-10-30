@@ -9,7 +9,7 @@ export function VerifyEmail(){
   if(!token){setState('error');setMessage('This verification link is incomplete. Request a new email from the sign-in screen.');return;}
   let active=true;
   fetch('/api/member/verify-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})})
-   .then(async response=>{const data=await response.json() as {error?:string};if(!response.ok)throw new Error(data.error||'Could not verify your email.');if(active){setState('success');setMessage('Your email address is verified. You can now access your membership account.');window.setTimeout(()=>window.location.assign('/member'),1200);}})
+   .then(async response=>{const data=await response.json() as {error?:string};if(!response.ok)throw new Error(data.error||'Could not verify your email.');if(active){setState('success');setMessage('Your email address is verified. You can now sign in; membership approval is still handled by store staff.');window.setTimeout(()=>window.location.assign('/member'),1200);}})
    .catch(error=>{if(active){setState('error');setMessage(error instanceof Error?error.message:'Could not verify your email.');}});
   return()=>{active=false;};
  },[]);

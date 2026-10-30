@@ -23,7 +23,7 @@
 .add-button:hover:not(:disabled),.add-button:focus-visible{color:#101017;background:var(--glow);box-shadow:0 0 22px color-mix(in srgb,var(--glow) 65%,transparent);transform:translateY(-2px)}
 .portion-switch button[aria-pressed=true]{box-shadow:0 0 14px color-mix(in srgb,var(--glow) 38%,transparent)}
 .collection-heading h2 em,.story-copy h2 em,.interior h1 em{color:#d5b8ff;text-shadow:0 0 28px #b968ff3d}
-.heading-star,.status-dot{filter:drop-shadow(0 0 8px #dd91ff)}
+
 .search-field,.sort-field,.filter-toggle,.panel,.order-summary,.cart-aside{border-color:#b48cce35}
 .form-field input:focus,.form-field textarea:focus,.form-field select:focus,.search-field:focus-within,.newsletter-field:focus-within{outline:2px solid #b993f2;outline-offset:3px;box-shadow:0 0 20px #b58aff35}
 .site-footer{background:radial-gradient(ellipse at 8% 100%,#31204370,transparent 50%),radial-gradient(ellipse at 90% 0%,#123a3a36,transparent 45%);border-top-color:#bd93ff36}
@@ -72,7 +72,7 @@ body{background:radial-gradient(ellipse at 90% 18%,#18346b35,transparent 32%),ra
 .product-card:hover,.product-card:focus-within{border-color:#83d5ff;box-shadow:0 0 22px #57bdff6b,0 0 58px #7977ff42,0 18px 45px #0008}
 .product-card .price{color:#a9e5ff}.product-card .add-button:hover:not(:disabled),.product-card .add-button:focus-visible{color:#061329;background:#99ddff;box-shadow:0 0 22px #7acaff99}
 .quick-view{background:#08172cdb}.collection-heading h2 em,.story-copy h2 em,.interior h1 em{color:#a8d9ff;text-shadow:0 0 28px #5baeff55}
-.heading-star,.status-dot{filter:drop-shadow(0 0 8px #75cfff)}.search-field,.sort-field,.filter-toggle,.panel,.order-summary,.cart-aside{border-color:#86bfff46}
+.search-field,.sort-field,.filter-toggle,.panel,.order-summary,.cart-aside{border-color:#86bfff46}
 .form-field input:focus,.form-field textarea:focus,.form-field select:focus,.search-field:focus-within,.newsletter-field:focus-within{outline-color:#9cddff;box-shadow:0 0 20px #63b8ff55}
 .pill-hero{background:radial-gradient(ellipse at 50% 45%,#122953,#060d1d 70%)}.joint-stage{background:radial-gradient(ellipse at 70% 50%,#17346b 0%,#0a1937 48%,#060c1c 85%)}.joint-overlay h2 em{color:#a8dfff}
 .site-footer{background:radial-gradient(ellipse at 8% 100%,#183c7970,transparent 50%),radial-gradient(ellipse at 90% 0%,#26347345,transparent 45%),#071224;border-top-color:#83bfff50}

@@ -1,6 +1,6 @@
 import {readFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import agreement from '../lib/signup-agreement.json' with {type:'json'};
+const agreement=JSON.parse(await readFile(new URL('../lib/signup-agreement.json',import.meta.url),'utf8'));
 
 const base=process.env.TEST_BASE_URL||'http://127.0.0.1:3001';
 if(!['127.0.0.1','localhost'].includes(new URL(base).hostname))throw new Error('Membership verification must use an isolated local database.');

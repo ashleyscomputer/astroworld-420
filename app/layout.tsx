@@ -11,10 +11,10 @@ import './galaxy-blue.css';
 import {StoreProvider,Header,Footer} from './storefront';
 
 export const metadata: Metadata = {
-  title:{default:'ASTROWORLD 420 — Explore the collection',template:'%s · Astroworld 420'},
-  description:'Escape the ordinary. Discover eight colourful products, in 1 g or 0.5 g. A little taste of another world.',
+  title:{default:'ASTROWORLD 420',template:'%s · Astroworld 420'},
+  description:'Astroworld 420.',
   metadataBase:new URL('https://astroworld-smoothie-orbit.maritzliam.chatgpt.site'),
-  openGraph:{title:'ASTROWORLD 420 — Enter another world.',description:'Eight originals. Infinite good energy. Explore the Astroworld 420 collection.',images:[{url:'/astroworld-420-brand.jpg',width:1254,height:1254,alt:'Astroworld 420 — Wish you were here'}],type:'website'},
+  openGraph:{title:'ASTROWORLD 420',images:[{url:'/og.svg',width:1200,height:630,alt:'Astroworld 420'}],type:'website'},
   icons: {
     icon: "/astroworld420-favicon.svg",
     shortcut: "/astroworld420-favicon.svg",

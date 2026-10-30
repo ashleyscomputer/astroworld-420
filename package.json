@@ -15,7 +15,8 @@
     "local": "node scripts/start-local.mjs",
     "test:store": "node --experimental-strip-types scripts/verify-store.mjs",
     "db:migrate:preview": "node scripts/apply-d1-migrations.mjs preview",
-    "db:migrate:production": "node scripts/apply-d1-migrations.mjs production"
+    "db:migrate:production": "node scripts/apply-d1-migrations.mjs production",
+    "test:members": "node scripts/verify-members.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

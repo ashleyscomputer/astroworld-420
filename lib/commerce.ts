@@ -1,8 +1,22 @@
 import {z} from 'zod';
 import {products,calculate,provinces,settings,type CartItem} from './catalog';
 import {database} from './server-db';
-export async function ensureInventory(){const db=database(),now=new Date().toISOString();await db.batch(products.map(p=>db.prepare('INSERT OR IGNORE INTO inventory(product_id,half_units,cost_cents,revision,updated_at) VALUES(?,?,NULL,0,?)').bind(p.id,0,now)));}
-export async function currentProducts(){await ensureInventory();const rows=await database().prepare('SELECT i.product_id,i.half_units,m.image_url FROM inventory i LEFT JOIN product_media m ON m.product_id=i.product_id').all<{product_id:string;half_units:number;image_url:string|null}>();const stock=new Map(rows.results.map(r=>[r.product_id,r]));return products.map(p=>{const row=stock.get(p.id);return {...p,stock:(row?.half_units||0)/2,image:row?.image_url||p.image,imagePosition:row?.image_url?'50% 50%':p.imagePosition};});}
+export async function ensureInventory(){
+ const db=database(),now=new Date().toISOString();
+ await db.batch(products.map(p=>db.prepare('INSERT OR IGNORE INTO catalog_products(id,slug,name,price_cents,second_gram_cents,third_gram_cents,glow_color,accent,short_description,long_description,product_number,active,revision,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,0,?,?)').bind(p.id,p.slug,p.name,Math.round(p.price*100),Math.round(p.tiers[1]*100),Math.round(p.tiers[2]*100),p.glowColor,p.accent,p.shortDescription,p.longDescription,p.number,1,now,now)));
+ await db.prepare('INSERT OR IGNORE INTO inventory(product_id,half_units,cost_cents,revision,updated_at) SELECT id,0,NULL,0,? FROM catalog_products').bind(now).run();
+}
+export async function currentProducts(includeInactive=false){
+ await ensureInventory();
+ const where=includeInactive?'':'WHERE c.active=1';
+ const rows=await database().prepare(`SELECT c.*,i.half_units,i.cost_cents,i.revision AS inventory_revision,m.image_url,m.revision AS image_revision FROM catalog_products c JOIN inventory i ON i.product_id=c.id LEFT JOIN product_media m ON m.product_id=c.id ${where} ORDER BY CAST(c.product_number AS INTEGER),c.created_at`).all<any>();
+ return rows.results.map((r:any)=>{
+  const fallback=products.find(p=>p.id===r.id);
+  const image=r.image_url||fallback?.image||'/astroworld-official-logo.jpeg';
+  const product:Product={id:r.id,slug:r.slug,name:r.name,price:r.price_cents/100,tiers:[r.price_cents/100,r.second_gram_cents/100,r.third_gram_cents/100],glowColor:r.glow_color,accent:r.accent,shortDescription:r.short_description,longDescription:r.long_description,stock:r.half_units/2,number:r.product_number,image,imagePosition:r.image_url?'50% 50%':fallback?.imagePosition,active:Boolean(r.active),productRevision:r.revision??0,imageRevision:r.image_revision??0};
+  return includeInactive?{...product,cost:r.cost_cents==null?null:r.cost_cents/100,revision:r.inventory_revision??0}:product;
+ });
+}
 export async function quoteOrder(items:CartItem[],method:string,code:string){return calculate(items,method,code,await currentProducts());}
 export const orderSchema=z.object({requestId:z.string().uuid(),items:z.array(z.object({productId:z.string(),size:z.enum(['full','half']),quantity:z.number().int().min(1).max(20)})).min(1).max(40),customer:z.object({name:z.string().trim().min(2).max(100),email:z.string().trim().email().max(200),phone:z.string().trim().regex(/^\+?[\d\s()-]{9,18}$/),street:z.string().max(200).default(''),suburb:z.string().max(100).default(''),city:z.string().max(100).default(''),province:z.string().max(40).default(''),postal:z.string().max(10).default(''),notes:z.string().max(1000).default('')}),method:z.literal('collection'),code:z.string().max(40).default(''),terms:z.literal(true),privacy:z.literal(true),age:z.boolean().optional(),payment:z.literal('preview')});
 export async function placeOrder(input:unknown,source:'customer'|'admin',memberId?:string){

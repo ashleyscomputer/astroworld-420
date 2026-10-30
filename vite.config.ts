@@ -6,8 +6,8 @@ import { configureToolEnvironment } from "./scripts/tool-environment.mjs";
 import { sites } from "./scripts/vite/sites-vite-plugin";
 import { connectorPreview } from "./scripts/vite/connector-preview-plugin.mjs";
 
-const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
-  "00000000-0000-4000-8000-000000000000";
+const PRODUCTION_D1_DATABASE_ID = "1d469d57-f7f9-4e90-b7f9-3c45deb3d1a6";
+const PREVIEW_D1_DATABASE_ID = "908ed519-2d90-4234-a604-639cf226c7d9";
 
 const { d1, r2 } = hostingConfig;
 
@@ -22,11 +22,15 @@ const localBindingConfig = {
     ? [
         {
           binding: d1,
-          database_name: "site-creator-d1",
-          database_id: SITE_CREATOR_PLACEHOLDER_DATABASE_ID,
+          database_name: "astroworld-420-production",
+          database_id: PRODUCTION_D1_DATABASE_ID,
+          preview_database_id: PREVIEW_D1_DATABASE_ID,
+          migrations_dir: "drizzle",
+          migrations_table: "d1_migrations",
         },
       ]
     : [],
+  send_email: [{ name: "EMAIL" }],
   r2_buckets: r2
     ? [
         {

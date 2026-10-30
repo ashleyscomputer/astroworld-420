@@ -1,4 +1,5 @@
 import {readFile} from 'node:fs/promises';
+import {createInterface} from 'node:readline/promises';
 import assert from 'node:assert/strict';
 const agreement=JSON.parse(await readFile(new URL('../lib/signup-agreement.json',import.meta.url),'utf8'));
 
@@ -12,13 +13,23 @@ async function req(path,method='GET',body,cookie='',status=200){
  assert.equal(response.status,status,`${path}: ${JSON.stringify(data)}`);
  return {data,response};
 }
-async function registerAndVerify({name,email,phone,token,password}){
+async function promptForToken(message,environmentKey){
+ if(process.env[environmentKey])return process.env[environmentKey];
+ const rl=createInterface({input:process.stdin,output:process.stdout});
+ try{
+  const input=(await rl.question(message)).trim();
+  const match=input.match(/(?:token=)?([a-f0-9]{64})/i);
+  if(!match)throw new Error('Paste the 64-character token from the local simulated email link.');
+  return match[1];
+ }finally{rl.close();}
+}
+async function registerAndVerify({name,email,phone,password,tokenKey}){
  const created=await req('/api/member','POST',{action:'register',name,email,phone,password,acceptance},'',201);
  assert.equal(created.data.verificationRequired,true);
  assert.equal(created.response.headers.get('set-cookie'),null,'Registration must not create a session before email verification.');
  assert.equal((await req('/api/member','GET')).data.member,null);
  await req('/api/auth/session','POST',{identifier:email,password},'',401);
- assert.ok(token,'Set the matching TEST_VERIFICATION_TOKEN_* from the local simulated verification email.');
+ const token=await promptForToken(`Paste the verification token for ${email} from the local simulated email: `,tokenKey);
  const verified=await req('/api/member/verify-email','POST',{token});
  const cookie=verified.response.headers.get('set-cookie')?.split(';')[0];
  assert.ok(cookie,'Verification must issue a member session.');
@@ -28,10 +39,7 @@ async function registerAndVerify({name,email,phone,token,password}){
 const suffix=crypto.randomUUID().slice(0,8),password='correct horse battery 420';
 await req('/api/admin/members','GET',undefined,'',401);
 const memberEmail=`member-${suffix}@example.invalid`;
-const memberCookie=await registerAndVerify({
- name:'QR test member',email:memberEmail,phone:'0820000000',password,
- token:process.env.TEST_VERIFICATION_TOKEN_1
-});
+const memberCookie=await registerAndVerify({name:'QR test member',email:memberEmail,phone:'0820000000',password,tokenKey:'TEST_VERIFICATION_TOKEN_1'});
 let member=(await req('/api/member','GET',undefined,memberCookie)).data.member;
 assert.equal(member.status,'pending');
 await req('/api/member/pass','POST',undefined,memberCookie,403);
@@ -50,10 +58,7 @@ assert.equal(scan.member.email,memberEmail);
 assert.equal(scan.ready.length,0);
 
 const otherEmail=`other-${suffix}@example.invalid`;
-const otherCookie=await registerAndVerify({
- name:'Other member',email:otherEmail,phone:'0820000001',password,
- token:process.env.TEST_VERIFICATION_TOKEN_2
-});
+const otherCookie=await registerAndVerify({name:'Other member',email:otherEmail,phone:'0820000001',password,tokenKey:'TEST_VERIFICATION_TOKEN_2'});
 const other=(await req('/api/member','GET',undefined,otherCookie)).data.member;
 
 const orderBody={requestId:crypto.randomUUID(),items:[{productId:'banana',size:'half',quantity:1}],customer:{name:member.name,email:memberEmail,phone:'0820000000'},method:'collection',code:'',terms:true,privacy:true,payment:'preview'};
@@ -87,17 +92,14 @@ await req('/api/admin/members','POST',{pass:refreshed},admin,404);
 await req('/api/member/pass','POST',undefined,memberCookie,403);
 
 await req('/api/member/password-reset','POST',{email:memberEmail},'',202);
-if(process.env.TEST_PASSWORD_RESET_TOKEN){
- const replacement='correct battery 420 astroworld secure';
- await req('/api/member/password-reset/confirm','POST',{token:process.env.TEST_PASSWORD_RESET_TOKEN,password:replacement});
- assert.equal((await req('/api/member','GET',undefined,memberCookie)).data.member,null,'Password reset must revoke existing sessions.');
- const signedIn=await req('/api/auth/session','POST',{identifier:memberEmail,password:replacement});
- assert.ok(signedIn.response.headers.get('set-cookie'),'New password must authenticate after reset.');
-}else{
- console.log('NOTE: Set TEST_PASSWORD_RESET_TOKEN from the local simulated password-reset email to exercise the one-time reset and session-revocation assertions.');
-}
+const resetToken=await promptForToken(`Paste the password-reset token for ${memberEmail} from the local simulated email: `,'TEST_PASSWORD_RESET_TOKEN');
+const replacement='correct battery 420 astroworld secure';
+await req('/api/member/password-reset/confirm','POST',{token:resetToken,password:replacement});
+assert.equal((await req('/api/member','GET',undefined,memberCookie)).data.member,null,'Password reset must revoke existing sessions.');
+const signedIn=await req('/api/auth/session','POST',{identifier:memberEmail,password:replacement});
+assert.ok(signedIn.response.headers.get('set-cookie'),'New password must authenticate after reset.');
 
 await req('/api/member','DELETE',undefined,otherCookie);
 assert.equal((await req('/api/member','GET',undefined,otherCookie)).data.member,null);
 await req('/api/auth/session','POST',{identifier:memberEmail,password:'incorrect'},'',401);
-console.log('PASS: verified registration gating, approval, QR scanning, linked orders, ready collection, member isolation, pass refresh/revocation, sign-in and password recovery request.');
+console.log('PASS: verified registration gating, approval, QR scanning, linked orders, ready collection, member isolation, pass refresh/revocation, sign-in, one-time password reset and session invalidation.');

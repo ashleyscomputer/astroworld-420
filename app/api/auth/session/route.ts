@@ -11,9 +11,8 @@ export async function POST(request:Request){
   return Response.json({ok:true,redirect:staff?'/admin':'/member'},{headers});
  }catch(e){
   const message=e instanceof Error?e.message:'';
-  if(message==='EMAIL_NOT_VERIFIED')return json({error:'Please verify your email address before signing in. You can request another verification link.'},403);
   if(message==='AUTH_RATE_LIMITED')return json({error:'Too many attempts. Please try again later.'},429);
-  return json({error:'Unable to sign in. Check your details or try again later.'},401);
+  return json({error:'Unable to sign in. Check your details or try again. If your email is not verified, you can request another verification link.'},401);
  }
 }
 export async function DELETE(request:Request){

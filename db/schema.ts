@@ -1,7 +1,7 @@
 // Intentionally empty by default.
 // Add Drizzle tables here when the site actually needs a database.
 // See examples/d1/db/schema.ts for an opt-in example.
-import {sqliteTable,text,integer,check,index} from 'drizzle-orm/sqlite-core';
+import {sqliteTable,text,integer,check,index,uniqueIndex} from 'drizzle-orm/sqlite-core';
 import {sql} from 'drizzle-orm';
 export const orders=sqliteTable('orders',{id:text('id').primaryKey(),requestId:text('request_id').notNull().unique(),email:text('email').notNull(),token:text('token').notNull(),payload:text('payload').notNull(),createdAt:text('created_at').notNull()});
 export const messages=sqliteTable('messages',{id:text('id').primaryKey(),email:text('email').notNull(),name:text('name').notNull(),message:text('message').notNull(),createdAt:text('created_at').notNull()});
@@ -28,3 +28,7 @@ export const memberSessions=sqliteTable('member_sessions',{hash:text('hash').pri
 export const memberPasses=sqliteTable('member_passes',{hash:text('hash').primaryKey(),memberId:text('member_id').notNull().references(()=>members.id),expires:integer('expires').notNull()});
 export const memberOrders=sqliteTable('member_orders',{orderId:text('order_id').primaryKey().references(()=>orders.id),memberId:text('member_id').notNull().references(()=>members.id)},t=>[index('member_orders_member_idx').on(t.memberId)]);
 export const firebaseIdentities=sqliteTable('firebase_identities',{uid:text('uid').primaryKey(),memberId:text('member_id').notNull().unique().references(()=>members.id),createdAt:text('created_at').notNull()});
+
+export const catalogProducts=sqliteTable('products',{
+ id:text('id').primaryKey(),slug:text('slug').notNull(),name:text('name').notNull(),priceCents:integer('price_cents').notNull(),glowColor:text('glow_color').notNull(),accent:text('accent').notNull(),shortDescription:text('short_description').notNull(),longDescription:text('long_description').notNull(),image:text('image').notNull(),productNumber:text('product_number').notNull(),active:integer('active').notNull().default(1),revision:integer('revision').notNull().default(0),createdAt:text('created_at').notNull(),updatedAt:text('updated_at').notNull(),
+},t=>[check('products_price_nonnegative',sql`${t.priceCents} >= 0`),check('products_active_boolean',sql`${t.active} IN (0,1)`),check('product_revision_nonnegative',sql`${t.revision} >= 0`),index('products_active_idx').on(t.active),uniqueIndex('products_slug_unique').on(t.slug)]);

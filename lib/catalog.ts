@@ -1,4 +1,4 @@
-export type Product = { id:string; slug:string; name:string; price:number; glowColor:string; accent:string; shortDescription:string; longDescription:string; stock:number; number:string; image:string };
+export type Product = { id:string; slug:string; name:string; price:number; glowColor:string; accent:string; shortDescription:string; longDescription:string; stock:number; number:string; image:string; active?:boolean; productRevision?:number; cost?:number|null; revision?:number };
 const catalog = [
  ['Super Berry',30,'#b791ff','#fa62be','A little berry. A whole new universe.',40],
  ['White Cheese',70,'#b6e5ff','#e9e4ff','Cool, creamy, cosmically smooth.',30],
@@ -6,10 +6,10 @@ const catalog = [
  ['Atomic',100,'#b7f574','#47d9b9','Big flavour. Maximum atmosphere.',20],
  ['Caramel',130,'#f2bb6c','#df8850','Golden hour, in your hands.',25],
  ['Rack',140,'#ff81bd','#ff575b','An original with a little attitude.',8],
- ['Sunset',150,'#ffa27e','#ea5cba','Catch a feeling. Chase the glow.',20],
- ['Cheese',160,'#ffc875','#ff854d','Smooth by nature. Bold by design.',18],
+ ['Sunset Sherbet',150,'#ffa27e','#ea5cba','Catch a feeling. Chase the glow.',20,'sunset'],
+ ['Indoor Cheese',160,'#ffc875','#ff854d','Smooth by nature. Bold by design.',18,'cheese'],
 ];
-export const products:Product[] = catalog.map((p,i)=>{const name=String(p[0]);const slug=name.toLowerCase().replaceAll(' ','-');return {id:slug,slug,name,price:Number(p[1]),glowColor:String(p[2]),accent:String(p[3]),shortDescription:String(p[4]),longDescription:`${p[4]} Meet ${name}, one of eight expressive Astroworld 420 smoothie originals. A colourful escape from the everyday, with a portion that suits your orbit. Choose 1 g or 0.5 g.`,stock:0,number:String(i+1).padStart(2,'0'),image:`/art/${slug}.svg?v=2`};});
+export const products:Product[] = catalog.map((p,i)=>{const name=String(p[0]);const slug=String(p[6]||name.toLowerCase().replaceAll(' ','-'));return {id:slug,slug,name,price:Number(p[1]),glowColor:String(p[2]),accent:String(p[3]),shortDescription:String(p[4]),longDescription:`${p[4]} Meet ${name}, one of the expressive Astroworld 420 originals. A colourful escape from the everyday, with a portion that suits your orbit. Choose 1 g or 0.5 g.`,stock:0,number:String(i+1).padStart(2,'0'),image:`/art/${slug}.svg?v=2`,active:true};});
 export const settings = {
  brand:'Astroworld 420',currency:'ZAR',demoMode:true,deliveryFee:45,freeDeliveryThreshold:300,
  ageGate:false,codEnabled:false,whatsappNumber:'',contactEmail:'',collectionAddress:'',

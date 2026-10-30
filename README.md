@@ -18,7 +18,7 @@ No online gateway, email provider, automatic courier service is connected. Payme
 
 The working project is in the Desktop folder **Astroworld 420**. Double-click **Start Astroworld.cmd**, or run `npm run local` in this folder. Node 22.13+ is required. The launcher installs dependencies if missing, builds the current source, applies pending local migrations, and serves **http://localhost:3000**. Keep its window open while using the store. If another application occupies port 3000, the launcher reports this without stopping it.
 
-The initial local admin login is **admin / admin** at **http://localhost:3000/admin**. Each new local product starts with **100 g and an illustrative R20 per gram cost** so checkout can be tried immediately. Edit these under Inventory. Orders, stock, costs and admin sessions persist in ignored `.wrangler/state`; restarting never resets existing stock. The cancelled “Local checkout test” order is retained as an audit trail. Production stock is separate and starts at zero until entered by the admin.
+The initial local admin login is **admin / admin** at **http://localhost:3000/admin**. The eight original demo products are seeded with **100 g and an illustrative R20 per gram cost** on a fresh local database. Products added under Admin → Products start at **0 g and no unit cost**; set their stock and cost under Inventory. Orders, stock, costs and admin sessions persist in ignored `.wrangler/state`; restarting never resets existing stock. The cancelled “Local checkout test” order is retained as an audit trail. Production stock is separate and starts at zero until entered by the admin.
 
 Local credentials live in ignored `.dev.vars`, and the generated preview configuration stays in ignored `.sites-runtime`, outside deployable build files. Local databases and personal Desktop photos are excluded from publication and GitHub. Stop this server before rebuilding on Windows. `npm run dev` also defaults to port 3000 for source development; the launcher is the complete local store with a durable database.
 
@@ -29,7 +29,7 @@ The hero uses the supplied island video, revealing from a line through a circle 
 - `lib/catalog.ts`: names, prices, artwork, delivery and discounts. Prices per 1 g are R30, R70, R70, R100, R130, R140, R150, R160 in product order. The price for 0.5 g is exactly 50%.
 - `app/storefront.tsx`, `app/globals.css`: customer interface.
 - `app/portal-hero.tsx`, `app/orbital-experience.tsx`, `app/experience.css`, `lib/cosmic-scene.ts`: hero and scrolling animation.
-- `app/admin-ui.tsx`, `app/admin.css`: admin interface.
+- `app/admin-ui.tsx`, `app/admin.css`: admin interface, including product catalogue management (name, price, descriptions, image upload/URL, colours and storefront visibility).
 - `lib/commerce.ts`: authoritative prices, reservations, cost snapshots and order changes.
 - `lib/admin-auth.ts`: credentials, sessions and login throttling.
 - `db/schema.ts`, `drizzle/`: append-only schema migrations and reservation/restock triggers. Never rewrite applied migrations.

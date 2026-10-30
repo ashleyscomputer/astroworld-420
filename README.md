@@ -36,6 +36,16 @@ The hero uses the supplied island video, revealing from a line through a circle 
 
 - `public/astroworld-420-brand.jpg`: user artwork, used as supplied with CSS layout effects.
 
+## Account verification and password recovery
+
+Customer registration requires a full name, email address, phone number, a 12-character minimum password, age confirmation and acceptance of the current agreement. New member accounts cannot sign in or receive an active QR pass until their email address is verified. Verification links are single-use and expire after 24 hours. Membership approval remains a separate staff action.
+
+The sign-in screen includes **Forgot password?** for customer email accounts. Reset links are single-use, expire after 30 minutes, and revoke existing member sessions after a successful password change. Verification and reset requests are rate-limited and their responses do not disclose whether an email address belongs to an account.
+
+Transactional messages use the Cloudflare Workers `EMAIL` binding. Set the non-secret Worker variables `AUTH_BASE_URL` (the canonical HTTPS website origin) and `AUTH_EMAIL_FROM` (an address on an Email Sending domain onboarded to the same Cloudflare account). The domain must have its sending DNS authentication configured and Email Sending must be enabled on the account's Workers plan. Local development uses Wrangler's simulated email binding; it logs and saves messages locally and does not deliver real email. Do not enable a remote email binding in local testing unless deliberately sending real messages.
+
+Google sign-in is intentionally deferred from the customer interface. The existing Firebase verification code is retained for a later launch phase.
+
 ## Membership and QR collection
 
 Customers register or sign in at /member. New accounts are pending until a signed-in staff member checks the customer's details and approves the request under Admin → Members & scan. Email verification and password recovery are not configured; staff must verify identity before approval. Disabled members cannot generate a valid pass.

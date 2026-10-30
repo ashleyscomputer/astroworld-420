@@ -17,7 +17,6 @@ export function OrbitalExperience({inspect:_inspect}:{inspect:()=>void}){
   <div className="joint-stage"><div className="joint-canvas" ref={mount} aria-hidden="true"/>
    <button type="button" className="joint-hover-target" aria-label="Replay cosmic animation" onClick={()=>controller.current?.replay()} onPointerEnter={e=>{if(e.pointerType==='mouse')controller.current?.replay();}} onFocus={()=>controller.current?.replay()}/>
    {!available&&<div className="joint-fallback" aria-hidden="true"><div className="joint-fallback-object"/></div>}
-   <div className="joint-overlay"><span>ASTROWORLD 420</span><h2>A cosmic<br/><em>interlude.</em></h2></div>
    {available&&<button className="joint-motion" onClick={()=>{const next=!playing;setPlaying(next);controller.current?.setPlaying(next);}} aria-label={playing?'Pause animation':'Play animation'} aria-pressed={playing}>{playing?<Pause size={16}/>:<Play size={16}/>}</button>}
   </div>
  </section>;

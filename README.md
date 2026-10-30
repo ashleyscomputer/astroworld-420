@@ -6,7 +6,7 @@ Dark smoothie storefront and authenticated admin dashboard, built with React, Ne
 
 The portal reveals on arrival and replays automatically when scrolled back into view; its video loops continuously. There is no replay button. The requested promotional clutter is removed. The supplied artwork remains in the 3D brand panel and social preview.
 
-`/admin` provides customer/admin orders, manual order creation, search, stock and unit-cost editing, payment/status recording, restock actions, stock history. The requested initial login is `admin` / `admin`, bootstrapped from server runtime secrets. Passwords are salted/hashed in D1; sessions use HTTP-only SameSite cookies, Secure on HTTPS. The private ChatGPT access gate remains intact. Changing the bootstrap environment value does not rotate a password already stored in D1.
+`/admin` provides the staff point-of-sale register, orders, member management and (for the super admin) reports, stock/cost editing, staff accounts and product catalogue management. Under Products, the super admin can add or edit product/strain names, first/second/third-gram prices, descriptions, artwork, colours and storefront visibility. New catalogue entries create an inventory row with zero stock and no cost; staff can only sell products that are active and in stock. The requested initial login is `admin` / `admin`, bootstrapped from server runtime secrets. Passwords are salted/hashed in D1; sessions use HTTP-only SameSite cookies, Secure on HTTPS. The private ChatGPT access gate remains intact. Changing the bootstrap environment value does not rotate a password already stored in D1.
 
 Stock starts at zero until entered by the admin. Banana = 100 g makes 100 g available. Orders reserve 1 g or 0.5 g. Reservation and order writes are atomic. Database triggers prevent overselling; request IDs prevent duplicate deductions. Cancellation or a recorded refund with restock restores units exactly once. Closed orders cannot reopen. Historical preview orders are preserved and shown separately, without affecting current stock or sales metrics.
 
@@ -18,7 +18,7 @@ No online gateway, email provider, automatic courier service is connected. Payme
 
 The working project is in the Desktop folder **Astroworld 420**. Double-click **Start Astroworld.cmd**, or run `npm run local` in this folder. Node 22.13+ is required. The launcher installs dependencies if missing, builds the current source, applies pending local migrations, and serves **http://localhost:3000**. Keep its window open while using the store. If another application occupies port 3000, the launcher reports this without stopping it.
 
-The initial local admin login is **admin / admin** at **http://localhost:3000/admin**. Each new local product starts with **100 g and an illustrative R20 per gram cost** so checkout can be tried immediately. Edit these under Inventory. Orders, stock, costs and admin sessions persist in ignored `.wrangler/state`; restarting never resets existing stock. The cancelled “Local checkout test” order is retained as an audit trail. Production stock is separate and starts at zero until entered by the admin.
+The initial local admin login is **admin / admin** at **http://localhost:3000/admin**. The eight original demo products are seeded with **100 g and an illustrative R20 per gram cost** in a fresh local database so checkout can be tried immediately. Products added later under Admin → Products start with **0 g and no unit cost**; enter those under Stock. Orders, stock, costs and admin sessions persist in ignored `.wrangler/state`; restarting never resets existing stock. The cancelled “Local checkout test” order is retained as an audit trail. Production stock is separate and starts at zero until entered by the admin.
 
 Local credentials live in ignored `.dev.vars`, and the generated preview configuration stays in ignored `.sites-runtime`, outside deployable build files. Local databases and personal Desktop photos are excluded from publication and GitHub. Stop this server before rebuilding on Windows. `npm run dev` also defaults to port 3000 for source development; the launcher is the complete local store with a durable database.
 
@@ -26,13 +26,13 @@ The hero uses the supplied island video, revealing from a line through a circle 
 
 ## Edit source
 
-- `lib/catalog.ts`: names, prices, artwork, delivery and discounts. Prices per 1 g are R30, R70, R70, R100, R130, R140, R150, R160 in product order. The price for 0.5 g is exactly 50%.
+- `lib/catalog.ts`: the eight original products, their initial tier prices, artwork, delivery and discounts. Admin-managed catalogue records are stored in D1; prices per 1 g and the second/third-gram rates are editable under Admin → Products.
 - `app/storefront.tsx`, `app/globals.css`: customer interface.
 - `app/portal-hero.tsx`, `app/orbital-experience.tsx`, `app/experience.css`, `lib/cosmic-scene.ts`: hero and scrolling animation.
-- `app/admin-ui.tsx`, `app/admin.css`: admin interface.
-- `lib/commerce.ts`: authoritative prices, reservations, cost snapshots and order changes.
+- `app/admin-ui.tsx`, `app/admin.css`: point-of-sale and admin interface, including Products (super admin only).
+- `lib/commerce.ts`: D1-backed catalogue and inventory reads, authoritative prices, reservations, cost snapshots and order changes.
 - `lib/admin-auth.ts`: credentials, sessions and login throttling.
-- `db/schema.ts`, `drizzle/`: append-only schema migrations and reservation/restock triggers. Never rewrite applied migrations.
+- `db/schema.ts`, `drizzle/`: append-only schema migrations including the D1 `catalog_products` table and reservation/restock triggers. Never rewrite applied migrations.
 
 - `public/astroworld-420-brand.jpg`: user artwork, used as supplied with CSS layout effects.
 

@@ -69,6 +69,21 @@ Transactional messages use the Cloudflare Workers `EMAIL` binding. Set the non-s
 
 Google sign-in is intentionally deferred from the customer interface. The existing Firebase verification code is retained for a later launch phase.
 
+## Authentication regression tests
+
+Run the local server on port 3001, then use Wrangler's local email simulation to inspect the verification and reset messages. The email simulator does not deliver messages externally.
+
+For the full member/QR/order regression flow, copy the 64-character tokens from the two simulated verification emails into PowerShell environment variables before running the test:
+
+```powershell
+$env:TEST_BASE_URL = "http://127.0.0.1:3001"
+$env:TEST_VERIFICATION_TOKEN_1 = "<first verification token>"
+$env:TEST_VERIFICATION_TOKEN_2 = "<second verification token>"
+node scripts/verify-members.mjs
+```
+
+To also test password reset and existing-session revocation, request the reset email during the test setup, then set `TEST_PASSWORD_RESET_TOKEN` to its token and rerun the test on a fresh isolated local database. Never use these test scripts against a production database.
+
 ## Membership and QR collection
 
 Customers register or sign in at /member. New accounts must verify their email before signing in, then remain pending until a signed-in staff member checks the customer's details and approves the request under Admin → Members & scan. Email verification does not replace staff approval. Disabled or expired members cannot generate a valid pass.

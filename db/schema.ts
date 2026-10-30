@@ -1,7 +1,7 @@
 // Intentionally empty by default.
 // Add Drizzle tables here when the site actually needs a database.
 // See examples/d1/db/schema.ts for an opt-in example.
-import {sqliteTable,text,integer,check,index} from 'drizzle-orm/sqlite-core';
+import {sqliteTable,text,integer,check,index,uniqueIndex} from 'drizzle-orm/sqlite-core';
 import {sql} from 'drizzle-orm';
 export const orders=sqliteTable('orders',{id:text('id').primaryKey(),requestId:text('request_id').notNull().unique(),email:text('email').notNull(),token:text('token').notNull(),payload:text('payload').notNull(),createdAt:text('created_at').notNull()});
 export const messages=sqliteTable('messages',{id:text('id').primaryKey(),email:text('email').notNull(),name:text('name').notNull(),message:text('message').notNull(),createdAt:text('created_at').notNull()});
@@ -33,4 +33,7 @@ export const staffAudit=sqliteTable('staff_audit_events',{id:text('id').primaryK
 export const memberEntitlements=sqliteTable('member_entitlements',{memberId:text('member_id').primaryKey().references(()=>members.id),plan:text('plan').notNull(),startsAt:text('starts_at').notNull(),expiresAt:text('expires_at').notNull(),approvedBy:text('approved_by').notNull()});
 export const agreementVersions=sqliteTable('agreement_versions',{version:text('version').primaryKey(),title:text('title').notNull(),body:text('body').notNull(),documentHash:text('document_hash').notNull(),createdAt:text('created_at').notNull()});
 export const agreementAcceptances=sqliteTable('agreement_acceptances',{id:text('id').primaryKey(),memberId:text('member_id').notNull().references(()=>members.id),version:text('version').notNull().references(()=>agreementVersions.version),documentHash:text('document_hash').notNull(),signerName:text('signer_name').notNull(),acceptedAt:text('accepted_at').notNull(),method:text('method').notNull()},t=>[index('agreement_acceptances_member_idx').on(t.memberId)]);
+export const catalogProducts=sqliteTable('catalog_products',{
+ id:text('id').primaryKey(),slug:text('slug').notNull(),name:text('name').notNull(),priceCents:integer('price_cents').notNull(),secondGramCents:integer('second_gram_cents').notNull(),thirdGramCents:integer('third_gram_cents').notNull(),glowColor:text('glow_color').notNull(),accent:text('accent').notNull(),shortDescription:text('short_description').notNull(),longDescription:text('long_description').notNull(),productNumber:text('product_number').notNull(),active:integer('active').notNull().default(1),revision:integer('revision').notNull().default(0),createdAt:text('created_at').notNull(),updatedAt:text('updated_at').notNull(),
+},t=>[check('catalog_products_price_nonnegative',sql`${t.priceCents} >= 0`),check('catalog_products_second_nonnegative',sql`${t.secondGramCents} >= 0`),check('catalog_products_third_nonnegative',sql`${t.thirdGramCents} >= 0`),check('catalog_products_active_boolean',sql`${t.active} IN (0,1)`),check('catalog_products_revision_nonnegative',sql`${t.revision} >= 0`),index('catalog_products_active_idx').on(t.active),uniqueIndex('catalog_products_slug_unique').on(t.slug)]);
 export const productMedia=sqliteTable('product_media',{productId:text('product_id').primaryKey().references(()=>inventory.productId),imageUrl:text('image_url').notNull(),revision:integer('revision').notNull().default(0),updatedAt:text('updated_at').notNull()});

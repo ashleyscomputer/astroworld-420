@@ -71,18 +71,14 @@ Google sign-in is intentionally deferred from the customer interface. The existi
 
 ## Authentication regression tests
 
-Run the local server on port 3001, then use Wrangler's local email simulation to inspect the verification and reset messages. The email simulator does not deliver messages externally.
-
-For the full member/QR/order regression flow, copy the 64-character tokens from the two simulated verification emails into PowerShell environment variables before running the test:
+Run the local server on port 3001, then run the membership regression script in an interactive terminal. The script registers two test members and prompts you to paste each verification token from Wrangler's simulated email output. It then requests a password-reset email and prompts for that token as well. The local email simulator does not deliver messages externally.
 
 ```powershell
 $env:TEST_BASE_URL = "http://127.0.0.1:3001"
-$env:TEST_VERIFICATION_TOKEN_1 = "<first verification token>"
-$env:TEST_VERIFICATION_TOKEN_2 = "<second verification token>"
 node scripts/verify-members.mjs
 ```
 
-To also test password reset and existing-session revocation, request the reset email during the test setup, then set `TEST_PASSWORD_RESET_TOKEN` to its token and rerun the test on a fresh isolated local database. Never use these test scripts against a production database.
+For non-interactive runs, provide `TEST_VERIFICATION_TOKEN_1`, `TEST_VERIFICATION_TOKEN_2` and `TEST_PASSWORD_RESET_TOKEN` in the environment. Never use these test scripts against a production database.
 
 ## Membership and QR collection
 

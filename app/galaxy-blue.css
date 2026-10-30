@@ -124,3 +124,5 @@ a:hover,.text-link:hover{color:var(--acid)}
 .admin-shell .admin-status,.admin-shell .admin-feedback{border-color:#56eef426}
 .admin-shell .admin-topbar .admin-user i{background:#56eef4;box-shadow:0 0 10px #56eef4}
 .admin-shell .admin-table th{color:#aeeff0}
+
+.universal-auth>.auth-brand-logo{width:78px;height:78px;margin:0 auto 18px}

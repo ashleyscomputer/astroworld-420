@@ -22,7 +22,7 @@ body{background:radial-gradient(ellipse at 8% 12%,#123e7133,transparent 38%),rad
 .panel,.order-summary,.cart-aside,.filter-panel,.payment-panel,.review-block,.quick-modal,.search-modal{background-color:#0b1930;border-color:#88c5ff30}
 .story-visual{background:radial-gradient(ellipse at 45% 40%,#15395d,#09172b 75%);border-color:#83c7ff30}.newsletter{background:linear-gradient(125deg,#102a48,#08172b)}
 .modal{background:#0a1930;border-color:#82c9ff40}.joint-experience{background:#050c18}.joint-stage{background:radial-gradient(ellipse at 70% 50%,#154778 0%,#091d37 48%,#050c1a 85%)}
-.joint-overlay span,.joint-overlay p{color:#a9c4df}.joint-motion{background:#0d223cbb;border-color:#9bd8ff40;color:#e8f6ff}
+.joint-motion{background:#0d223cbb;border-color:#9bd8ff40;color:#e8f6ff}
 .discounts-intro p{color:#c5d8ed}.discounts-intro .discounts-note{color:#a8bed6}.discount-card{border-color:#87c7ff30;background:linear-gradient(145deg,#102b48,#0a172b)}
 .discount-card-head>span,.discount-card-head p,.discount-example strong,.discount-card>.text-link{color:#b0e4ff}.discount-card dt{color:#d8e8f8}.discount-card dt small{color:#a4bbd4}.discount-card dd{color:#f0f8ff}.discount-example{color:#bdd2e7}
 .site-footer{background:radial-gradient(ellipse at 5% 100%,#164b7b55,transparent 52%),radial-gradient(ellipse at 95% 0%,#153f6a40,transparent 48%),#061124;border-top-color:#84cfff38}

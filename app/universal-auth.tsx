@@ -28,7 +28,6 @@ export function UniversalAuth(){
    const result=await response.json() as {error?:string;message?:string;redirect?:string};
    if(!response.ok){
     if(signup&&response.status===503&&result.error?.includes('account details were saved')){setMode('verify');setNotice(result.error);return;}
-    if(!signup&&mode==='login'&&response.status===403&&result.error?.includes('verify your email')){setMode('verify');setNotice(result.error);return;}
     throw new Error(result.error||'Unable to continue.');
    }
    if(signup){setMode('verify');setNotice('Your account has been created. Check your email and use the verification link before signing in.');setPassword('');return;}

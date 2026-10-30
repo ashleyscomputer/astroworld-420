@@ -14,7 +14,7 @@
     "db:generate": "drizzle-kit generate",
     "local": "node scripts/start-local.mjs",
     "test:store": "node --experimental-strip-types scripts/verify-store.mjs",
-    "db:migrate:preview": "wrangler d1 migrations apply astroworld-420-preview --remote --config dist/server/wrangler.json",
+    "db:migrate:preview": "wrangler d1 migrations apply astroworld-420-release-preview --remote --config dist/server/wrangler.json",
     "db:migrate:production": "wrangler d1 migrations apply astroworld-420-production --remote --config dist/server/wrangler.json"
   },
   "dependencies": {

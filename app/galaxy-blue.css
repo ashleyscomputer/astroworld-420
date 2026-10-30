@@ -1,5 +1,5 @@
 /* Final site palette: deep navy, electric blue and icy cyan. */
-:root{--bg:#050c1b;--panel:#0b1b32;--ink:#eff7ff;--muted:#a8bed7;--line:#8fcaff2b;--acid:#91dcff;--purple:#75baff;--cosmic-pink:#70c8ff;--cosmic-cyan:#8aeaff;--cosmic-violet:#78b7ff;--premium-black:#050c1b;--premium-purple:#75baff;--premium-pink:#89d9ff;--premium-green:#91dcff}
+:root{--bg:#050c1b;--panel:#0b1b32;--ink:#eff7ff;--muted:#a8bed7;--line:#8fcaff2b;--acid:#56eef4;--purple:#75baff;--cosmic-pink:#70c8ff;--cosmic-cyan:#56eef4;--cosmic-violet:#78b7ff;--premium-black:#050c1b;--premium-purple:#75baff;--premium-pink:#89d9ff;--premium-green:#56eef4}
 body{background:radial-gradient(ellipse at 8% 12%,#123e7133,transparent 38%),radial-gradient(ellipse at 95% 45%,#10498b26,transparent 40%),var(--bg);color:var(--ink)}
 .site-header{background:linear-gradient(110deg,#07172cef,#071326f2 60%,#0c2340f0);border-bottom-color:#82c9ff38;box-shadow:0 8px 32px #0005,0 1px 22px #3b9aff18}
 .nav-brand-logo{box-shadow:0 0 16px #65baff45}.brand-420{color:#b7eaff;background:#4bafff17;border-color:#87d7ff66}
@@ -64,3 +64,48 @@ body{background:radial-gradient(ellipse at 8% 12%,#123e7133,transparent 38%),rad
 @media(min-width:761px) and (max-width:1250px){.site-header{height:auto;min-height:112px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:64px 48px;gap:0}.main-nav,.main-nav.is-open{grid-column:1/-1;grid-row:2;position:static;display:flex;flex-direction:row;align-items:center;gap:24px;overflow-x:auto;scrollbar-width:none;white-space:nowrap;height:48px;margin:0 calc(-1 * var(--space));padding:0 var(--space);background:none;border:0}.main-nav a,.main-nav a:last-child{display:block;flex:0 0 auto;font-size:12px}.pill-hero{height:calc(100svh - 112px)}.joint-stage{top:112px;height:calc(100svh - 112px)}}
 @media(max-width:760px){.about-story{padding-top:38px;padding-bottom:48px;gap:32px}.story-copy h1{font-size:48px;margin:18px 0 24px}.story-copy p{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.site-header:before,.site-header:after{animation:none}}
+
+
+/* Unified electric-cyan accent and simplified brand placements */
+:root{--acid:#56eef4;--cosmic-cyan:#56eef4;--premium-green:#56eef4}
+.admin-shell,.admin-login,.admin-overlay{--acid:#56eef4}
+.button.primary{background:var(--acid);color:#06151b}
+.button.primary:hover:not(:disabled){background:#8af7f8;box-shadow:0 0 28px #56eef455}
+a:hover,.text-link:hover{color:var(--acid)}
+:focus-visible{outline-color:var(--acid)}
+.site-header .brand-420,.brand-420{color:var(--acid);border-color:#56eef455;background:#56eef412}
+.site-header .main-nav a.active:before{background:var(--acid);box-shadow:0 0 12px #56eef4}
+.animated-logo-frame{display:block;flex:0 0 auto;border:0;background:transparent;overflow:hidden}
+.nav-brand-logo{width:46px;height:46px;border-radius:50%;box-shadow:0 0 18px #56eef43d}
+.site-header .brand,.footer-top>.brand{gap:10px}
+.story-logo-frame{position:absolute;inset:0;width:100%;height:100%;border:0}
+.hero-heading{position:absolute;inset:0;display:grid;place-items:center;width:100%}
+.hero-logo-frame{width:min(78vw,660px);height:min(78vw,660px);border:0;filter:drop-shadow(0 0 26px #56eef424)}
+.hero-bottom{justify-content:center}
+.hero-cta{margin-left:0}
+.hero-bottom .scroll-cue{display:none}
+.admin-sidebar .admin-brand{align-items:center;gap:10px}
+.admin-sidebar .admin-brand-logo{width:54px;height:54px;border-radius:50%;box-shadow:0 0 18px #56eef43d}
+.joint-overlay h2{max-width:500px}
+.joint-contact-link{display:inline-flex;align-items:center;gap:8px;margin-top:13px;color:var(--acid);font-weight:650;transition:transform .25s ease,filter .25s ease}
+.joint-contact-link:hover{transform:translateY(-3px);filter:drop-shadow(0 0 12px #56eef48a)}
+.footer-top>div .social-icon{position:relative;display:grid;place-items:center;width:46px;height:46px;border:1px solid transparent;border-radius:50%;overflow:hidden;transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s ease,filter .28s ease}
+.footer-top>div .social-icon:before{content:"";position:absolute;inset:0;border-radius:inherit;opacity:1;transition:filter .28s ease,transform .28s ease}
+.footer-top>div .social-icon svg,.footer-top>div .social-icon .whatsapp-icon{position:relative;z-index:1}
+.footer-top>div .social-icon:hover,.footer-top>div .social-icon:focus-visible{transform:translateY(-4px) scale(1.08);box-shadow:0 0 24px #56eef455;filter:saturate(1.18)}
+.footer-top>div .social-icon:hover:before{transform:scale(1.08);filter:brightness(1.12)}
+.social-instagram:before{background:linear-gradient(45deg,#feda75 0%,#fa7e1e 24%,#d62976 52%,#962fbf 76%,#4f5bd5 100%)}
+.social-whatsapp:before{background:#25d366}
+.social-maps:before{background:#fff}
+.social-instagram svg{color:#fff;stroke:#fff}
+.social-whatsapp .whatsapp-icon{color:#fff}
+.social-maps svg{color:#4285f4}
+@media(max-width:760px){
+ .nav-brand-logo{width:38px;height:38px}
+ .hero-logo-frame{width:min(90vw,520px);height:min(90vw,520px)}
+ .admin-sidebar .admin-brand-logo{width:48px;height:48px}
+}
+@media(prefers-reduced-motion:reduce){
+ .footer-top>div .social-icon,.joint-contact-link{transition:none}
+ .footer-top>div .social-icon:hover,.footer-top>div .social-icon:focus-visible,.joint-contact-link:hover{transform:none}
+}

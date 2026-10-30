@@ -109,3 +109,18 @@ a:hover,.text-link:hover{color:var(--acid)}
  .footer-top>div .social-icon,.joint-contact-link{transition:none}
  .footer-top>div .social-icon:hover,.footer-top>div .social-icon:focus-visible,.joint-contact-link:hover{transform:none}
 }
+
+/* Match the admin workspace to the storefront's navy and #56EEF4 accent. */
+.admin-shell{background:#050c1b;color:#eff7ff}
+.admin-main{background:#050c1b}
+.admin-sidebar{background:#071326;border-right:1px solid #56eef429}
+.admin-sidebar nav>button.active{background:#56eef416;border-color:#56eef455;color:#56eef4}
+.admin-sidebar nav>button.active svg{color:#56eef4}
+.admin-sidebar-foot>*:hover{color:#56eef4}
+.admin-panel,.admin-order-detail,.inventory-card{background:#0b1b32;border-color:#56eef426}
+.admin-shell .button.primary{background:#56eef4;color:#06151b;border-color:#56eef4}
+.admin-shell .button.primary:hover:not(:disabled){background:#8af7f8;color:#06151b;box-shadow:0 0 24px #56eef444}
+.admin-shell input:focus,.admin-shell select:focus,.admin-shell textarea:focus{border-color:#56eef4;box-shadow:0 0 0 3px #56eef414}
+.admin-shell .admin-status,.admin-shell .admin-feedback{border-color:#56eef426}
+.admin-shell .admin-topbar .admin-user i{background:#56eef4;box-shadow:0 0 10px #56eef4}
+.admin-shell .admin-table th{color:#aeeff0}

@@ -113,19 +113,3 @@ a:hover,.text-link:hover{color:var(--acid)}
 .admin-shell .admin-status,.admin-shell .admin-feedback{border-color:#56eef426}
 .admin-shell .admin-topbar .admin-user i{background:#56eef4;box-shadow:0 0 10px #56eef4}
 .admin-shell .admin-table th{color:#aeeff0}
-
-
-
-/* The animated O sits inside the original expanding portal wordmark. */
-.portal-shell .hero-logo-o{position:absolute;inset:0;display:grid;place-items:center;width:100%;height:100%;pointer-events:none}
-.animated-logo-o{position:relative;display:block;width:calc(var(--portal-h) * .9 * 84 / 166);height:90%;aspect-ratio:84/166;isolation:isolate;mix-blend-mode:screen;animation:astroworld-o-wave 3.2s ease-in-out infinite}
-.animated-logo-o-sprite{position:absolute;inset:0;background:url('/astroworld420-animated-o.svg') center/100% 100% no-repeat;mix-blend-mode:screen}
-.animated-logo-o-echo{animation:astroworld-o-trail 2.4s linear var(--echo-delay) infinite}
-.animated-logo-o-echo.echo-one{--echo-delay:0s}
-.animated-logo-o-echo.echo-two{--echo-delay:-.8s}
-.animated-logo-o-echo.echo-three{--echo-delay:-1.6s}
-.animated-logo-o-main{animation:astroworld-o-glow 4s ease-in-out infinite}
-@keyframes astroworld-o-trail{0%{transform:scale(.7);opacity:0}25%{opacity:.9}100%{transform:scale(1.6);opacity:0}}
-@keyframes astroworld-o-glow{50%{filter:brightness(1.45) saturate(1.25)}}
-@keyframes astroworld-o-wave{50%{transform:translateY(-4%) rotate(1.2deg)}}
-@media(prefers-reduced-motion:reduce){.animated-logo-o,.animated-logo-o-echo,.animated-logo-o-main{animation:none}.animated-logo-o-echo{opacity:0}}

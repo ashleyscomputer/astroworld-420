@@ -75,17 +75,8 @@ a:hover,.text-link:hover{color:var(--acid)}
 :focus-visible{outline-color:var(--acid)}
 .site-header .brand-420,.brand-420{color:var(--acid);border-color:#56eef455;background:#56eef412}
 .site-header .main-nav a.active:before{background:var(--acid);box-shadow:0 0 12px #56eef4}
-.animated-logo-frame{display:block;flex:0 0 auto;border:0;background:transparent;overflow:hidden}
 .nav-brand-logo{width:46px;height:46px;border-radius:50%;box-shadow:0 0 18px #56eef43d}
 .site-header .brand,.footer-top>.brand{gap:10px}
-.story-logo-frame{position:absolute;inset:0;width:100%;height:100%;border:0}
-.hero-heading{position:absolute;inset:0;display:grid;place-items:center;width:100%;transform:none;text-align:center}
-.hero-logo-frame{width:min(78vw,660px);height:min(78vw,660px);border:0;filter:drop-shadow(0 0 26px #56eef424)}
-.hero-bottom{justify-content:center}
-.hero-cta{margin-left:0}
-.hero-bottom .scroll-cue{display:none}
-.admin-sidebar .admin-brand{align-items:center;gap:10px}
-.admin-sidebar .admin-brand-logo{width:54px;height:54px;border-radius:50%;box-shadow:0 0 18px #56eef43d}
 .joint-overlay h2{max-width:500px}
 .joint-contact-link{display:inline-flex;align-items:center;gap:8px;margin-top:13px;color:var(--acid);font-weight:650;transition:transform .25s ease,filter .25s ease}
 .joint-contact-link:hover{transform:translateY(-3px);filter:drop-shadow(0 0 12px #56eef48a)}
@@ -102,8 +93,6 @@ a:hover,.text-link:hover{color:var(--acid)}
 .social-maps svg{color:#4285f4}
 @media(max-width:760px){
  .nav-brand-logo{width:38px;height:38px}
- .hero-logo-frame{width:min(90vw,520px);height:min(90vw,520px)}
- .admin-sidebar .admin-brand-logo{width:48px;height:48px}
 }
 @media(prefers-reduced-motion:reduce){
  .footer-top>div .social-icon,.joint-contact-link{transition:none}
@@ -125,4 +114,18 @@ a:hover,.text-link:hover{color:var(--acid)}
 .admin-shell .admin-topbar .admin-user i{background:#56eef4;box-shadow:0 0 10px #56eef4}
 .admin-shell .admin-table th{color:#aeeff0}
 
-.universal-auth>.auth-brand-logo{width:78px;height:78px;margin:0 auto 18px}
+
+
+/* The animated O sits inside the original expanding portal wordmark. */
+.portal-shell .hero-logo-o{position:absolute;inset:0;display:grid;place-items:center;width:100%;height:100%;pointer-events:none}
+.animated-logo-o{position:relative;display:block;height:90%;aspect-ratio:84/166;isolation:isolate;mix-blend-mode:screen;animation:astroworld-o-wave 3.2s ease-in-out infinite}
+.animated-logo-o-sprite{position:absolute;inset:0;background:url('/astroworld420-animated-o.svg') center/100% 100% no-repeat;mix-blend-mode:screen}
+.animated-logo-o-echo{animation:astroworld-o-trail 2.4s linear var(--echo-delay) infinite}
+.animated-logo-o-echo.echo-one{--echo-delay:0s}
+.animated-logo-o-echo.echo-two{--echo-delay:-.8s}
+.animated-logo-o-echo.echo-three{--echo-delay:-1.6s}
+.animated-logo-o-main{animation:astroworld-o-glow 4s ease-in-out infinite}
+@keyframes astroworld-o-trail{0%{transform:scale(.7);opacity:0}25%{opacity:.9}100%{transform:scale(1.6);opacity:0}}
+@keyframes astroworld-o-glow{50%{filter:brightness(1.45) saturate(1.25)}}
+@keyframes astroworld-o-wave{50%{transform:translateY(-4%) rotate(1.2deg)}}
+@media(prefers-reduced-motion:reduce){.animated-logo-o,.animated-logo-o-echo,.animated-logo-o-main{animation:none}.animated-logo-o-echo{opacity:0}}

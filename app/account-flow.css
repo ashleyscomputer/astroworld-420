@@ -24,3 +24,4 @@
 .product-media>img{display:block;width:100%;height:100%;object-fit:cover}.product-media.bud-art{width:100%;height:100%;border-radius:0}
 .bag-line>a>.product-media{width:100px;height:100px}.summary-line>.product-media{width:55px;height:55px;flex:none;border-radius:8px}.inventory-card-top>.product-media{width:60px;height:60px;flex:none;border-radius:10px}
 @keyframes cosmic-shoot-vivid{0%{opacity:0;transform:translate(-10vw,-5vh) rotate(18deg)}2%{opacity:.95}20%{opacity:.8}25%,100%{opacity:0;transform:translate(130vw,35vh) rotate(18deg)}}
+@media(max-width:600px){.auth-page{padding:32px 12px}.auth-page>.universal-auth{padding:24px 18px;border-radius:18px}.account-modal .modal-content{padding:38px 20px 24px}.bag-line>a>.product-media{width:74px;height:84px}}

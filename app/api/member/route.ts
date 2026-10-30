@@ -7,7 +7,7 @@ export async function GET(request:Request){
 }
 export async function POST(request:Request){
  try{
-  const b=z.object({action:z.literal('register'),name:z.string().trim().min(2).max(100),email:z.string().trim().email().max(200),phone:z.string().trim().regex(/^\+?[\d\s()-]{9,18}$/),password:z.string().min(12).max(128),acceptance:z.object({version:z.string(),hash:z.string(),accepted:z.literal(true),ageConfirmed:z.literal(true)})}).parse(await request.json());
+  const b=z.object({action:z.literal('register'),name:z.string().trim().min(2).max(100),email:z.string().trim().email().max(200),phone:z.string().trim().regex(/^\+?[\d\s()-]{9,18}$/).refine(value=>(value.match(/\d/g)||[]).length>=9&&(value.match(/\d/g)||[]).length<=15),password:z.string().min(12).max(128),acceptance:z.object({version:z.string(),hash:z.string(),accepted:z.literal(true),ageConfirmed:z.literal(true)})}).parse(await request.json());
   await register(request,b.name,b.email,b.phone,b.password,b.acceptance);
   return json({ok:true,verificationRequired:true},201);
  }catch(e){

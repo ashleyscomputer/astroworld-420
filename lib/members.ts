@@ -2,8 +2,7 @@ import {database,sameOrigin} from './server-db';
 import {digest} from './admin-auth';
 import {acceptanceSchema,agreementStatements} from './agreements';
 import {authRateLimit,requestEmailVerification,verifyMemberEmail,resetMemberPassword} from './account-emails';
-const encoder=new TextEncoder();
-const PASSWORD_ITERATIONS=150000;
+const encoder=new TextEncoder(),PASSWORD_ITERATIONS=150000;
 async function hashPassword(password:string,salt:string){const key=await crypto.subtle.importKey('raw',encoder.encode(password),'PBKDF2',false,['deriveBits']);return Array.from(new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',salt:encoder.encode(salt),iterations:PASSWORD_ITERATIONS,hash:'SHA-256'},key,256)),b=>b.toString(16).padStart(2,'0')).join('');}
 function equal(a:string,b:string){if(a.length!==b.length)return false;let result=0;for(let i=0;i<a.length;i++)result|=a.charCodeAt(i)^b.charCodeAt(i);return result===0;}
 function token(){return crypto.randomUUID()+crypto.randomUUID();}
@@ -17,16 +16,10 @@ export async function memberIdentity(request:Request){
 }
 export async function createMemberSession(memberId:string,duration=604800000){const value=token(),now=Date.now(),db=database();await db.batch([db.prepare('DELETE FROM member_sessions WHERE expires<?').bind(now),db.prepare('INSERT INTO member_sessions(hash,member_id,expires) VALUES(?,?,?)').bind(await digest(value),memberId,now+duration)]);return value;}
 export async function register(request:Request,name:string,email:string,phone:string,password:string,acceptance:unknown){
- sameOrigin(request);acceptanceSchema.parse(acceptance);const normalized=email.trim().toLowerCase();
- await authRateLimit(request,'member-register',normalized,10);
+ sameOrigin(request);acceptanceSchema.parse(acceptance);const normalized=email.trim().toLowerCase();await authRateLimit(request,'member-register',normalized,10);
  const db=database(),salt=token(),id=crypto.randomUUID(),createdAt=new Date().toISOString();
- try{
-  await db.batch([
-   db.prepare('INSERT INTO members(id,email,name,phone,salt,password_hash,status,created_at,email_verified_at) VALUES(?,?,?,?,?,?,?,?,NULL)').bind(id,normalized,name.trim(),phone.trim(),salt,await hashPassword(password,salt),'pending',createdAt),
-   ...agreementStatements(id,name.trim(),acceptance)
-  ]);
- }catch(e){if(String(e).includes('UNIQUE'))throw new Error('An account already exists for that email. Sign in or request another verification email.');throw e;}
- // The account remains pending and cannot authenticate until its one-time email link is used.
+ try{await db.batch([db.prepare('INSERT INTO members(id,email,name,phone,salt,password_hash,status,created_at,email_verified_at) VALUES(?,?,?,?,?,?,?,?,NULL)').bind(id,normalized,name.trim(),phone.trim(),salt,await hashPassword(password,salt),'pending',createdAt),...agreementStatements(id,name.trim(),acceptance)]);}
+ catch(e){if(String(e).includes('UNIQUE'))throw new Error('An account already exists for that email. Sign in or request another verification email.');throw e;}
  await requestEmailVerification(request,normalized);
 }
 export async function memberLogin(request:Request,email:string,password:string){
@@ -37,10 +30,11 @@ export async function memberLogin(request:Request,email:string,password:string){
  return createMemberSession(user.id);
 }
 export async function memberLogout(request:Request){sameOrigin(request);const value=cookie(request);if(value)await database().prepare('DELETE FROM member_sessions WHERE hash=?').bind(await digest(value)).run();}
-export async function verifyMemberEmailAndCreateSession(tokenValue:string){const ok=await verifyMemberEmail(tokenValue);if(!ok)return null;const row=await database().prepare('SELECT id FROM members WHERE email_verified_at IS NOT NULL AND id=(SELECT member_id FROM email_verification_tokens WHERE token_hash=? AND used_at=?)').bind(await digest(tokenValue),Date.now()).first<{id:string}>();return row?createMemberSession(row.id):null;}
+export async function verifyMemberEmailAndCreateSession(tokenValue:string){
+ const memberId=await verifyMemberEmail(tokenValue);return memberId?createMemberSession(memberId):null;
+}
 export async function changeMemberPassword(tokenValue:string,password:string){
- const salt=token(),hash=await hashPassword(password,salt);
- return resetMemberPassword(tokenValue,salt,hash);
+ const salt=token(),hash=await hashPassword(password,salt);return resetMemberPassword(tokenValue,salt,hash);
 }
 export async function createPass(request:Request){
  sameOrigin(request);const member=await memberIdentity(request);if(!member||member.status!=='active')throw new Error('An active membership is required.');

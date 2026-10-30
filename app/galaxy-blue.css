@@ -34,22 +34,16 @@ body{background:radial-gradient(ellipse at 8% 12%,#123e7133,transparent 38%),rad
 @media(max-width:760px){.footer-business-address{flex-basis:100%;text-align:left}.site-footer .footer-bottom{gap:15px;flex-wrap:wrap}}
 
 /* A clear, accessible newsletter focal point. */
-.newsletter.section-wrap{position:relative;isolation:isolate;overflow:hidden;max-width:1440px;width:calc(100% - var(--space) * 2);margin:50px auto 76px;padding:60px;gap:8%;border:1px solid #79cfff65;border-radius:30px;background:radial-gradient(ellipse at 5% 90%,#2171b53d,transparent 65%),linear-gradient(120deg,#0d2645,#07162c);box-shadow:0 0 35px #349bff21,0 22px 65px #0004}
-.newsletter:before{content:'';position:absolute;z-index:-1;pointer-events:none;width:340px;height:340px;left:-100px;bottom:-230px;border-radius:50%;background:#34baff;filter:blur(100px);opacity:.32}
-.newsletter:after{content:'';position:absolute;pointer-events:none;top:0;left:14%;right:14%;height:1px;background:linear-gradient(90deg,transparent,#b5ecff,transparent);box-shadow:0 0 16px #75cfff}
-.newsletter-copy{position:relative;min-width:0}.newsletter .eyebrow{display:inline-flex;align-items:center;gap:9px;color:#bceaff;letter-spacing:.11em;font-size:10px;font-weight:650}
-.newsletter h2{font-size:clamp(42px,5.2vw,76px);font-weight:750;line-height:1.02;letter-spacing:-.055em;margin:22px 0 18px}.newsletter h2 em{color:#a4e0ff;font-weight:750;text-shadow:0 0 38px #47b8ff42}
-.newsletter-copy>p{color:#c2d5ea;font-size:16px;line-height:1.6;max-width:300px}.newsletter-spark{position:absolute;right:0;top:60px;font-size:74px;font-weight:300;color:#87ddff;opacity:.8;text-shadow:0 0 24px #5acfff70}
+.newsletter.section-wrap{position:relative;isolation:isolate;overflow:hidden;max-width:1440px;width:calc(100% - var(--space) * 2);margin:50px auto 76px;padding:60px;gap:0;border:1px solid #79cfff65;border-radius:30px;background:radial-gradient(ellipse at 5% 90%,#2171b53d,transparent 65%),linear-gradient(120deg,#0d2645,#07162c);box-shadow:0 0 35px #349bff21,0 22px 65px #0004}
+
+
 .newsletter form{min-width:0;padding:28px;border:1px solid #a6d8ff35;border-radius:20px;background:#071426b8;box-shadow:0 8px 32px #0003}
-.newsletter form>p{font-size:21px;font-weight:650;color:#eff8ff;margin:0 0 20px;letter-spacing:-.025em}
 .newsletter-field{gap:8px;align-items:center;border:1px solid #86caff60;border-radius:12px;background:#0d2139;padding:6px;transition:border-color .2s,box-shadow .2s}
 .newsletter-field:focus-within{border-color:#bbeeff;box-shadow:0 0 0 3px #64c6ff1f,0 0 24px #53b7ff30}
 .newsletter-field input{width:100%;min-width:0;padding:12px 10px;background:transparent;color:#eff8ff;font-size:16px;outline:none;box-shadow:none}.newsletter-field input::placeholder{color:#a9c2dd}
 .newsletter-field button{display:inline-flex;align-items:center;justify-content:center;gap:10px;flex:none;width:auto;min-height:46px;padding:12px 16px;border-radius:8px;background:#a4e2ff;color:#061729;font-size:13px;font-weight:750;white-space:nowrap;box-shadow:0 0 20px #64bfff35;transition:background .2s,box-shadow .2s,transform .2s}
 .newsletter-field button:hover:not(:disabled){background:#d0f2ff;box-shadow:0 0 25px #7bd3ff65;transform:translateY(-1px)}.newsletter-field button:focus-visible{outline:2px solid #e0f8ff;outline-offset:3px}.newsletter-field button:disabled{opacity:.65;cursor:wait}
 .newsletter .checkbox.small{font-size:13px;line-height:1.7;color:#c4d8ee;margin-top:20px;gap:12px}.newsletter .checkbox.small input{width:19px;height:19px;margin-top:2px}.newsletter .checkbox a{color:#a5e1ff;text-decoration-thickness:1px}.newsletter .checkbox a:hover{color:#e8f9ff}.newsletter form>p[role=status]{margin-top:18px;font-size:14px;font-weight:500;line-height:1.6;letter-spacing:0}
-@media(max-width:1050px){.newsletter.section-wrap{padding:38px;gap:5%}.newsletter-spark{font-size:48px;right:4px;top:76px}.newsletter-field{flex-wrap:wrap}.newsletter-field button{width:100%}.newsletter form{padding:22px}}
-@media(max-width:640px){.newsletter.section-wrap{grid-template-columns:1fr;width:calc(100% - 32px);margin:32px auto 48px;padding:30px 20px;gap:28px;border-radius:22px}.newsletter h2{font-size:52px;margin-top:20px}.newsletter-spark{font-size:60px;right:8px;top:54px}.newsletter-copy>p{font-size:15px}.newsletter form{padding:20px}.newsletter form>p{font-size:20px}.newsletter-field button{min-height:48px}.newsletter .checkbox.small{font-size:13px}.newsletter .eyebrow{font-size:9px;letter-spacing:.08em}}
 @media(prefers-reduced-motion:reduce){.newsletter-field,.newsletter-field button{transition:none}.newsletter-field button:hover:not(:disabled){transform:none}}
 
 /* Animated border treatment adapted to the site's blue palette. */

@@ -25,6 +25,8 @@ const localBindingConfig = {
           database_name: "astroworld-420-production",
           database_id: PRODUCTION_D1_DATABASE_ID,
           preview_database_id: PREVIEW_D1_DATABASE_ID,
+          migrations_dir: "drizzle",
+          migrations_table: "d1_migrations",
         },
       ]
     : [],

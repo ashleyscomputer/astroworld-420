@@ -4,7 +4,8 @@ import {ArrowRight,CheckCircle2,LoaderCircle} from 'lucide-react';
 export function VerifyEmail(){
  const [state,setState]=useState<'loading'|'success'|'error'>('loading'),[message,setMessage]=useState('Verifying your email address…');
  useEffect(()=>{
-  const token=new URLSearchParams(window.location.search).get('token');
+  const token=new URLSearchParams(window.location.hash.slice(1)).get('token');
+  window.history.replaceState(null,'',window.location.pathname);
   if(!token){setState('error');setMessage('This verification link is incomplete. Request a new email from the sign-in screen.');return;}
   let active=true;
   fetch('/api/member/verify-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})})

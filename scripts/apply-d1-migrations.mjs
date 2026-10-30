@@ -16,7 +16,7 @@ const targets={
   id:'1d469d57-f7f9-4e90-b7f9-3c45deb3d1a6'
  }
 };
-if(!(target in targets)){
+if(!Object.hasOwn(targets,target)){
  console.error('Usage: node scripts/apply-d1-migrations.mjs <preview|production>');
  process.exit(2);
 }
@@ -34,9 +34,7 @@ config.d1_databases=[{
  migrations_dir:path.resolve('drizzle'),
  migrations_table:'d1_migrations'
 }];
-const runtimeDir=path.resolve('.sites-runtime');
-await fs.mkdir(runtimeDir,{recursive:true});
-const configPath=path.join(runtimeDir,`d1-${target}-migrations.json`);
+const configPath=path.resolve('dist/server',`wrangler-${target}-migrations.json`);
 await fs.writeFile(configPath,JSON.stringify(config,null,2));
 console.log(`Applying committed Drizzle migrations to remote D1: ${database.name}`);
 console.log('Wrangler will ask you to confirm before applying changes.');

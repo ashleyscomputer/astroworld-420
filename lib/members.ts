@@ -1,7 +1,7 @@
 import {database,sameOrigin} from './server-db';
 import {digest} from './admin-auth';
 import {acceptanceSchema,agreementStatements} from './agreements';
-import {authRateLimit,requestEmailVerification,verifyMemberEmail,resetMemberPassword} from './account-emails';
+import {authRateLimit,sendVerificationEmail,verifyMemberEmail,resetMemberPassword} from './account-emails';
 const encoder=new TextEncoder(),PASSWORD_ITERATIONS=150000;
 async function hashPassword(password:string,salt:string){const key=await crypto.subtle.importKey('raw',encoder.encode(password),'PBKDF2',false,['deriveBits']);return Array.from(new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',salt:encoder.encode(salt),iterations:PASSWORD_ITERATIONS,hash:'SHA-256'},key,256)),b=>b.toString(16).padStart(2,'0')).join('');}
 function equal(a:string,b:string){if(a.length!==b.length)return false;let result=0;for(let i=0;i<a.length;i++)result|=a.charCodeAt(i)^b.charCodeAt(i);return result===0;}
@@ -20,7 +20,7 @@ export async function register(request:Request,name:string,email:string,phone:st
  const db=database(),salt=token(),id=crypto.randomUUID(),createdAt=new Date().toISOString();
  try{await db.batch([db.prepare('INSERT INTO members(id,email,name,phone,salt,password_hash,status,created_at,email_verified_at) VALUES(?,?,?,?,?,?,?,?,NULL)').bind(id,normalized,name.trim(),normalizedPhone,salt,await hashPassword(password,salt),'pending',createdAt),...agreementStatements(id,name.trim(),acceptance)]);}
  catch(e){if(String(e).includes('UNIQUE'))throw new Error('An account already exists for that email. Sign in or request another verification email.');throw e;}
- await requestEmailVerification(request,normalized);
+ await sendVerificationEmail(request,id,normalized,name.trim());
 }
 export async function memberLogin(request:Request,email:string,password:string){
  sameOrigin(request);const normalized=email.trim().toLowerCase();await authRateLimit(request,'member-login',normalized,8);

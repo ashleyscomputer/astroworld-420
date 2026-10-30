@@ -71,7 +71,7 @@ Google sign-in is intentionally deferred from the customer interface. The existi
 
 ## Membership and QR collection
 
-Customers register or sign in at /member. New accounts are pending until a signed-in staff member checks the customer's details and approves the request under Admin → Members & scan. Email verification and password recovery are not configured; staff must verify identity before approval. Disabled members cannot generate a valid pass.
+Customers register or sign in at /member. New accounts must verify their email before signing in, then remain pending until a signed-in staff member checks the customer's details and approves the request under Admin → Members & scan. Email verification does not replace staff approval. Disabled or expired members cannot generate a valid pass.
 
 Google sign-in uses Firebase Authentication when the web-app configuration is present. Set FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID and FIREBASE_APP_ID in the local .dev.vars and as runtime environment variables for the hosted Site. Set FIREBASE_GOOGLE_ENABLED=true only after the Google provider and authorized domains are configured. Enable Google sign-in in Firebase and add each site hostname to Firebase Authentication's authorized domains. These web-app configuration values are public identifiers, not service-account keys. The server verifies Google's signature and Firebase project, token expiry, recent authentication, Google provider and verified email before issuing an application session.
 

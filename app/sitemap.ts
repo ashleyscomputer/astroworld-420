@@ -1,2 +1,3 @@
 import {currentProducts} from '@/lib/commerce';
+export const dynamic='force-dynamic';
 export default async function sitemap(){const base='https://astroworld-smoothie-orbit.maritzliam.chatgpt.site';const products=await currentProducts();return ['','/shop','/about','/faq','/contact','/delivery-returns','/terms','/privacy',...products.map(p=>`/product/${p.slug}`)].map(path=>({url:base+path,lastModified:new Date(),changeFrequency:'weekly' as const,priority:path===''?1:.7}));}

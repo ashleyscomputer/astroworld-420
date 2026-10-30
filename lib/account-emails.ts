@@ -4,7 +4,11 @@ import {emailSender,runtime} from './server-db';
 function randomToken(){const bytes=crypto.getRandomValues(new Uint8Array(32));return Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');}
 function escapeHtml(value:string){return value.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]||char));}
 function appUrl(request:Request,path:string,token:string){
- const configured=runtime('AUTH_BASE_URL'),base=configured||new URL(request.url).origin,url=new URL(path,base);
+ const configured=runtime('AUTH_BASE_URL'),requestOrigin=new URL(request.url).origin;
+ const requestHost=new URL(request.url).hostname,local=requestHost==='localhost'||requestHost==='127.0.0.1';
+ const base=configured||(local?requestOrigin:'');
+ if(!base)throw new Error('AUTH_BASE_URL is required for public account emails.');
+ const url=new URL(path,base);
  if(url.protocol!=='https:'&&url.hostname!=='localhost'&&url.hostname!=='127.0.0.1')throw new Error('AUTH_BASE_URL must use HTTPS.');
  url.hash=new URLSearchParams({token}).toString();return url.toString();
 }

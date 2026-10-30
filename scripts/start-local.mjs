@@ -5,6 +5,11 @@ await new Promise((resolve,reject)=>{const socket=net.createConnection({host:'12
 function run(args){const result=spawnSync(process.execPath,args,{stdio:'inherit',env:process.env});if(result.error)throw result.error;if(result.status!==0)process.exit(result.status||1);}
 try{await fs.access('node_modules/vinext');}catch{run(['scripts/install-ci.mjs']);}
 try{await fs.access('.dev.vars');}catch{await fs.writeFile('.dev.vars','ADMIN_USERNAME=admin\nADMIN_INITIAL_PASSWORD=admin\n');}
+const localVars=await fs.readFile('.dev.vars','utf8');
+const localDefaults=[];
+if(!/^AUTH_BASE_URL=/m.test(localVars))localDefaults.push(`AUTH_BASE_URL=http://localhost:${port}`);
+if(!/^AUTH_EMAIL_FROM=/m.test(localVars))localDefaults.push('AUTH_EMAIL_FROM=accounts@example.org');
+if(localDefaults.length)await fs.appendFile('.dev.vars',`\n${localDefaults.join('\n')}\n`);
 if(process.env.ASTROWORLD_SKIP_BUILD!=='1')run(['scripts/run-framework.mjs','build']);
 const configPath=await localConfig(),state=path.resolve(process.env.ASTROWORLD_STATE||'.wrangler/state');
 const cli=['--import','./scripts/sites-env.mjs','./node_modules/wrangler/bin/wrangler.js'];

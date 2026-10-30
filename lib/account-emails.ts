@@ -6,7 +6,7 @@ function escapeHtml(value:string){return value.replace(/[&<>"']/g,char=>({'&':'&
 function appUrl(request:Request,path:string,token:string){
  const configured=runtime('AUTH_BASE_URL'),base=configured||new URL(request.url).origin,url=new URL(path,base);
  if(url.protocol!=='https:'&&url.hostname!=='localhost'&&url.hostname!=='127.0.0.1')throw new Error('AUTH_BASE_URL must use HTTPS.');
- url.searchParams.set('token',token);return url.toString();
+ url.hash=new URLSearchParams({token}).toString();return url.toString();
 }
 async function send(to:string,subject:string,heading:string,description:string,url:string,button:string){
  const sender=emailSender(),from=runtime('AUTH_EMAIL_FROM');if(!sender||!from)throw new Error('EMAIL_DELIVERY_UNAVAILABLE');

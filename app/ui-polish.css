@@ -23,8 +23,8 @@
 .add-button:hover:not(:disabled),.add-button:focus-visible{color:#101017;background:var(--glow);box-shadow:0 0 22px color-mix(in srgb,var(--glow) 65%,transparent);transform:translateY(-2px)}
 .portion-switch button[aria-pressed=true]{box-shadow:0 0 14px color-mix(in srgb,var(--glow) 38%,transparent)}
 .collection-heading h2 em,.story-copy h2 em,.interior h1 em{color:#d5b8ff;text-shadow:0 0 28px #b968ff3d}
-.heading-star,.status-dot{filter:drop-shadow(0 0 8px #dd91ff)}
-.search-field,.sort-field,.filter-toggle,.panel,.order-summary,.cart-aside{border-color:#b48cce35}
+
+.search-field,.sort-field,.filter-toggle,.panel,.order-summary,{border-color:#b48cce35}
 .form-field input:focus,.form-field textarea:focus,.form-field select:focus,.search-field:focus-within,.newsletter-field:focus-within{outline:2px solid #b993f2;outline-offset:3px;box-shadow:0 0 20px #b58aff35}
 .site-footer{background:radial-gradient(ellipse at 8% 100%,#31204370,transparent 50%),radial-gradient(ellipse at 90% 0%,#123a3a36,transparent 45%);border-top-color:#bd93ff36}
 .footer-label{color:#a8ebef;letter-spacing:.18em}.footer-top>div a{font-size:12px;line-height:1.4;color:#ddd2e4;transition:color .2s,transform .2s,text-shadow .2s}
@@ -72,23 +72,15 @@ body{background:radial-gradient(ellipse at 90% 18%,#18346b35,transparent 32%),ra
 .product-card:hover,.product-card:focus-within{border-color:#83d5ff;box-shadow:0 0 22px #57bdff6b,0 0 58px #7977ff42,0 18px 45px #0008}
 .product-card .price{color:#a9e5ff}.product-card .add-button:hover:not(:disabled),.product-card .add-button:focus-visible{color:#061329;background:#99ddff;box-shadow:0 0 22px #7acaff99}
 .quick-view{background:#08172cdb}.collection-heading h2 em,.story-copy h2 em,.interior h1 em{color:#a8d9ff;text-shadow:0 0 28px #5baeff55}
-.heading-star,.status-dot{filter:drop-shadow(0 0 8px #75cfff)}.search-field,.sort-field,.filter-toggle,.panel,.order-summary,.cart-aside{border-color:#86bfff46}
+.search-field,.sort-field,.filter-toggle,.panel,.order-summary,.cart-aside{border-color:#86bfff46}
 .form-field input:focus,.form-field textarea:focus,.form-field select:focus,.search-field:focus-within,.newsletter-field:focus-within{outline-color:#9cddff;box-shadow:0 0 20px #63b8ff55}
 .pill-hero{background:radial-gradient(ellipse at 50% 45%,#122953,#060d1d 70%)}.joint-stage{background:radial-gradient(ellipse at 70% 50%,#17346b 0%,#0a1937 48%,#060c1c 85%)}.joint-overlay h2 em{color:#a8dfff}
 .site-footer{background:radial-gradient(ellipse at 8% 100%,#183c7970,transparent 50%),radial-gradient(ellipse at 90% 0%,#26347345,transparent 45%),#071224;border-top-color:#83bfff50}
 .footer-label{color:#9ee6ff}.footer-top>div a:hover,.footer-top>div a:focus-visible{text-shadow:0 0 14px #72d0ff}.preview-strip{background:#0c1a32;color:#c4d6ee}
 .staff-login-modal{background:radial-gradient(ellipse at top right,#233d72,#0c172a 65%);border-color:#85c6ff75}.staff-login-modal p{color:#c7d5e7}.staff-login-modal a{color:#a4e1ff}
 
-/* Background stars are decorative and never intercept page interaction. */
-.cosmic-sky{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
-.cosmic-stars{position:absolute;inset:0;opacity:.6;background-image:radial-gradient(1px 1px at 7% 12%,#e7f8ff 95%,transparent),radial-gradient(1.5px 1.5px at 23% 37%,#b9e4ff 95%,transparent),radial-gradient(1px 1px at 53% 14%,#fff 95%,transparent),radial-gradient(1px 1px at 76% 56%,#b5e5ff 95%,transparent),radial-gradient(1.5px 1.5px at 88% 29%,#eff9ff 95%,transparent),radial-gradient(1px 1px at 42% 77%,#fff 95%,transparent),radial-gradient(1px 1px at 16% 82%,#c3e3ff 95%,transparent);background-size:390px 340px;animation:cosmic-twinkle 7s ease-in-out infinite alternate}
-.cosmic-stars-far{opacity:.34;background-size:570px 490px;background-position:120px 80px;animation-duration:11s;animation-direction:alternate-reverse}
-.cosmic-shooting-star{position:absolute;top:10%;left:-140px;width:110px;height:1px;opacity:0;background:linear-gradient(90deg,transparent,#83cdff,#fff);filter:drop-shadow(0 0 5px #8cceff);transform:rotate(18deg);animation:cosmic-shoot 13s linear infinite}
-.cosmic-shooting-star:nth-of-type(2){top:25%;animation-delay:4s;animation-duration:18s}.cosmic-shooting-star:nth-of-type(3){top:40%;animation-delay:9s;animation-duration:21s}.cosmic-shooting-star:nth-of-type(4){top:5%;animation-delay:14s;animation-duration:23s}.cosmic-shooting-star:nth-of-type(5){top:58%;animation-delay:19s;animation-duration:27s}
-@keyframes cosmic-twinkle{from{opacity:.3}to{opacity:.7}}@keyframes cosmic-shoot{0%,74%{opacity:0;transform:translate(0,0) rotate(18deg)}75%{opacity:.8}84%{opacity:0;transform:translate(120vw,25vh) rotate(18deg)}100%{opacity:0;transform:translate(120vw,25vh) rotate(18deg)}}
 main,.site-footer{position:relative;z-index:1}.pill-hero{background:radial-gradient(ellipse at 50% 45%,#122953b8,#060d1dd9 70%)}
 .pill-hero .portal-wordline{flex-direction:row;gap:3px;white-space:nowrap}.pill-hero{--portal-w:clamp(56px,6.5vw,100px);--portal-h:var(--portal-w)}
 .pill-hero .portal-window{width:var(--portal-w);height:var(--portal-w);border-radius:50%;border:1px solid #9cddff99;box-shadow:0 0 14px #85d3ff80,0 0 42px #578dff55;flex-shrink:0}
 .pill-hero .portal-window video{width:var(--portal-w);height:var(--portal-w);object-fit:cover}
 @media(max-width:760px){.pill-hero{--portal-w:clamp(30px,8vw,58px)}.pill-hero .portal-wordline{gap:3px;flex-direction:row}.pill-hero .portal-wordline .word-left,.pill-hero .portal-wordline .word-right{font-size:clamp(29px,8vw,58px);letter-spacing:-.065em}.pill-hero .portal-wordline .hero-420{font-size:9px;top:-12px;right:0}}
-@media(prefers-reduced-motion:reduce){.cosmic-stars{animation:none;opacity:.55}.cosmic-shooting-star{display:none}}

@@ -1,7 +1,7 @@
 'use client';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {useReducedMotion} from 'framer-motion';
-import {ArrowDown,ArrowUpRight,Play} from 'lucide-react';
+import {ArrowUpRight,Play} from 'lucide-react';
 
 export function PillHero(){
  const root=useRef<HTMLElement>(null),pill=useRef<HTMLButtonElement>(null),row=useRef<HTMLDivElement>(null),logo=useRef<HTMLImageElement>(null),shade=useRef<HTMLSpanElement>(null),animations=useRef<Animation[]>([]);
@@ -30,12 +30,10 @@ export function PillHero(){
   return()=>{active=false;observer?.disconnect();window.removeEventListener('resize',resize);animations.current.forEach(a=>a.cancel());};
  },[reveal,still]);
  return <section ref={root} className="hero pill-hero logo-hero" aria-label="Astroworld 420 animated logo">
-  <svg className="portal-field" viewBox="0 0 1440 960" preserveAspectRatio="none" aria-hidden="true">{Array.from({length:15},(_,i)=><path key={i} d={`M${i*130-350} 1060 C${i*90-200} 550 ${i*90+150} 400 ${i*120+400} -100`}/>)}</svg>
-  <div className="ambient ambient-one"/><div className="ambient ambient-two"/>
   <div className="hero-heading"><h1 className="sr-only">Astroworld 420 — products</h1><div ref={row} className="hero-wordline portal-wordline" onPointerEnter={e=>{if(e.pointerType==='mouse')reveal();}}>
    <span className="word-left">ASTR</span><button type="button" ref={pill} className="portal-shell portal-window logo-window" data-reveal="waiting" aria-label="Animate the Astroworld logo O" onClick={reveal} onFocus={reveal}><img ref={logo} className="hero-logo-o" src="/astroworld-official-logo.jpeg" alt="" width="1254" height="1254" fetchPriority="high"/><span ref={shade} className="portal-hairline"/></button><span className="word-right">WORLD<sup className="hero-420">420</sup></span>
   </div></div>
-  <div className="hero-bottom"><div className="hero-cta"><a href="#collection" className="button primary">Shop the collection<ArrowUpRight size={20}/></a></div><a href="#collection" className="scroll-cue"><span>SCROLL TO EXPLORE</span><span className="scroll-circle"><ArrowDown size={18}/></span></a></div>
+  <div className="hero-bottom"><div className="hero-cta"><a href="#collection" className="button primary">Shop the collection<ArrowUpRight size={20}/></a></div></div>
   {still&&<button className="portal-play" onClick={()=>setOverride(true)}><Play size={13}/>Enable animation</button>}
  </section>;
 }

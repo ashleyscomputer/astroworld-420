@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useState,type FormEvent} from 'react';
 import {ArrowRight,Mail,RefreshCw} from 'lucide-react';
 import agreement from '@/lib/signup-agreement.json';
 
@@ -19,7 +19,7 @@ export function UniversalAuth(){
   catch(e){setError(e instanceof Error?e.message:'Could not send the email.');}
   finally{setBusy(false);}
  };
- const submit=async(e:React.FormEvent<HTMLFormElement>)=>{
+ const submit=async(e:FormEvent<HTMLFormElement>)=>{
   e.preventDefault();if(busy)return;const invalid=validate();if(invalid){setError(invalid);return;}setBusy(true);setError('');setNotice('');
   try{
    const endpoint=signup?'/api/member':mode==='forgot'?'/api/member/password-reset':'/api/auth/session';
@@ -56,7 +56,7 @@ export function UniversalAuth(){
     <label className="form-field"><span>{signup||mode==='forgot'?'Email address':'Email or staff username'}</span><input type={signup||mode==='forgot'?'email':'text'} value={identifier} onChange={e=>setIdentifier(e.target.value)} required maxLength={200} autoComplete="username"/></label>
     {mode!=='forgot'&&<label className="form-field"><span>{signup?'Password · at least 12 characters':'Password'}</span><input type="password" value={password} onChange={e=>setPassword(e.target.value)} required minLength={signup?12:1} maxLength={128} autoComplete={signup?'new-password':'current-password'}/></label>}
     {signup&&<><details className="signup-agreement"><summary>Read Shared Terms & Conditions</summary><div className="agreement-text" role="region" aria-label="Shared Terms and Conditions" tabIndex={0}>{agreement.paragraphs.map((p,i)=><p key={i}>{p}</p>)}</div><a href={agreement.download} target="_blank" rel="noopener noreferrer">Download agreement</a></details><label className="checkbox"><input type="checkbox" checked={age} onChange={e=>setAge(e.target.checked)} required/><span>I confirm that I am 18 or older.</span></label><label className="checkbox"><input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)} required/><span>I accept & declare that I have read and agree to the Shared Terms & Conditions. My acceptance is recorded under my full name.</span></label></>}
-    {mode==='login'&&<div className="auth-actions"><button type="button" className="text-link" onClick={()=>resetState('forgot')}>Forgot password?</button></div>}
+    {mode==='login'&&identifier.includes('@')&&<div className="auth-actions"><button type="button" className="text-link" onClick={()=>resetState('forgot')}>Forgot password?</button></div>}
     {notice&&<p className="auth-note" role="status">{notice}</p>}
     {error&&<p className="error" role="alert">{error}</p>}
     <button className="button primary" disabled={busy}>{busy?'Please wait…':signup?'Create account':mode==='forgot'?'Send password-reset link':'Sign in'}<ArrowRight size={17}/></button>

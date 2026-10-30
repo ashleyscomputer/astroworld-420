@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body><StoreProvider><a className="skip-link" href="#main">Skip to content</a><Header/>{children}<Footer/></StoreProvider></body>
+      <body><div className="cosmic-sky" aria-hidden="true"><div className="cosmic-stars"/><div className="cosmic-stars cosmic-stars-far"/><span className="cosmic-shooting-star"/><span className="cosmic-shooting-star"/><span className="cosmic-shooting-star"/><span className="cosmic-shooting-star"/><span className="cosmic-shooting-star"/></div><StoreProvider><a className="skip-link" href="#main">Skip to content</a><Header/>{children}<Footer/></StoreProvider></body>
     </html>
   );
 }

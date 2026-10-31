@@ -6,6 +6,7 @@ import './member.css';
 import './ui-polish.css';
 import './premium.css';
 import './admin-pos.css';
+import './mobile-responsive.css';
 import './account-flow.css';
 import './galaxy-blue.css';
 import {StoreProvider,Header,Footer} from './storefront';

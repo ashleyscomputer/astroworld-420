@@ -3,7 +3,10 @@ import {digest} from './admin-auth';
 import {acceptanceSchema,agreementStatements} from './agreements';
 import {membershipFeeCents,type MembershipPlan} from './membership-pricing';
 const encoder=new TextEncoder();
-async function hashPassword(password:string,salt:string){const key=await crypto.subtle.importKey('raw',encoder.encode(password),'PBKDF2',false,['deriveBits']);return Array.from(new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',salt:encoder.encode(salt),iterations:150000,hash:'SHA-256'},key,256)),b=>b.toString(16).padStart(2,'0')).join('');}
+// Cloudflare Workers currently reject PBKDF2 iteration counts above 100,000.
+// Keep registration and verification aligned with the Workers runtime limit.
+const PASSWORD_HASH_ITERATIONS=100_000;
+async function hashPassword(password:string,salt:string){const key=await crypto.subtle.importKey('raw',encoder.encode(password),'PBKDF2',false,['deriveBits']);return Array.from(new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',salt:encoder.encode(salt),iterations:PASSWORD_HASH_ITERATIONS,hash:'SHA-256'},key,256)),b=>b.toString(16).padStart(2,'0')).join('');}
 function equal(a:string,b:string){if(a.length!==b.length)return false;let result=0;for(let i=0;i<a.length;i++)result|=a.charCodeAt(i)^b.charCodeAt(i);return result===0;}
 function token(){return crypto.randomUUID()+crypto.randomUUID();}
 export function memberCookie(request:Request,value:string,maxAge=604800){return `aw_member=${value}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${new URL(request.url).protocol==='https:'?'; Secure':''}`;}

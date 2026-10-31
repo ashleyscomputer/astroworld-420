@@ -2,7 +2,7 @@
 import {useEffect,useState} from 'react';
 import type {Auth,GoogleAuthProvider,UserCredential} from 'firebase/auth';
 type Config={apiKey:string;authDomain:string;projectId:string;appId:string};
-type GoogleDetails={name?:string;phone?:string;acceptance?:{version:string;hash:string;accepted:boolean;ageConfirmed:boolean}};
+type GoogleDetails={name?:string;phone?:string;plan?:'day'|'monthly';acceptance?:{version:string;hash:string;accepted:boolean;ageConfirmed:boolean}};
 type Ready={auth:Auth;Provider:typeof GoogleAuthProvider;popup:(auth:Auth,provider:GoogleAuthProvider)=>Promise<UserCredential>;signOut:(auth:Auth)=>Promise<void>};
 export function GoogleSignIn({details,completed,label='Continue with Google',validate}:{details:()=>GoogleDetails;completed:()=>Promise<void>;label?:string;validate?:()=>string|null}){
  const [ready,setReady]=useState<Ready|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[checked,setChecked]=useState(false);

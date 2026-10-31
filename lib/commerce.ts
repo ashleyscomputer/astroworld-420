@@ -33,7 +33,7 @@ export async function placeOrder(input:unknown,source:'customer'|'admin',memberI
  const payload={id,...quote,customer:{...b.customer,email},method:b.method,payment:'Manual confirmation — no online payment collected',status:'pending',demo:true,source,createdAt:now,emailStatus:'not_sent',fulfilment:'Awaiting admin confirmation.'};
  try{await db.batch([
   db.prepare('INSERT INTO orders(id,request_id,email,token,payload,created_at) VALUES(?,?,?,?,?,?)').bind(id,b.requestId,email,token,JSON.stringify(payload),now),
-  db.prepare('INSERT INTO sales(order_id,state,payment_state,source,net_cents,cost_cents,total_cents,revision,updated_at) VALUES(?,?,?,?,?,?,?,?,?)').bind(id,'pending','pending',source,Math.round((quote.subtotal-quote.discount)*100),costCents,Math.round(quote.total*100),0,now),
+  db.prepare('INSERT INTO sales(order_id,state,payment_state,source,net_cents,cost_cents,total_cents,revision,updated_at) VALUES(?,?,?,?,?,?,?,?,?)').bind(id,'pending','pending',source,Math.round((quote.subtotal-quote.discount+quote.loungeAccessFee)*100),costCents,Math.round(quote.total*100),0,now),
   ...(memberId?[db.prepare('INSERT INTO member_orders(order_id,member_id) VALUES(?,?)').bind(id,memberId)]:[]),
   ...lines.map(l=>db.prepare('INSERT INTO order_lines(id,order_id,product_id,half_units,cost_cents) VALUES(?,?,?,?,?)').bind(l.id,id,l.productId,l.halfUnits,l.costCents)),
  ]);}catch(e){const duplicate=await db.prepare('SELECT id,token,email FROM orders WHERE request_id=?').bind(b.requestId).first<{id:string;token:string;email:string}>();if(duplicate&&duplicate.email===email)return {...duplicate,duplicate:true};if(String(e).includes('INSUFFICIENT_STOCK'))throw new Error('Stock changed while you checked out. Refresh your bag and try again.');throw e;}

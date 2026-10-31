@@ -2,7 +2,7 @@
   "version": "6",
   "dialect": "sqlite",
   "id": "5f38e3da-2d4a-4e50-a2f9-987654321007",
-  "prevId": "5f38e3da-2d4a-4e50-a2f9-987654321007",
+  "prevId": "f3ac75d1-55c0-4da2-9391-510f3a56e2f4",
   "tables": {
     "admin_sessions": {
       "name": "admin_sessions",

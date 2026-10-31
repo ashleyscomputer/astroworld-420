@@ -1,5 +1,6 @@
 import {z} from 'zod';
 import {products,calculate,provinces,settings,type CartItem,type Product} from './catalog';
+import type {LoungeAccessChoice} from './membership-pricing';
 import {database} from './server-db';
 export async function ensureInventory(){
  const db=database(),now=new Date().toISOString();
@@ -17,14 +18,14 @@ export async function currentProducts(includeInactive=false){
   return includeInactive?{...product,cost:r.cost_cents==null?null:r.cost_cents/100,revision:r.inventory_revision??0}:product;
  });
 }
-export async function quoteOrder(items:CartItem[],method:string,code:string){return calculate(items,method,code,await currentProducts());}
-export const orderSchema=z.object({requestId:z.string().uuid(),items:z.array(z.object({productId:z.string(),size:z.enum(['full','half']),quantity:z.number().int().min(1).max(20)})).min(1).max(40),customer:z.object({name:z.string().trim().min(2).max(100),email:z.string().trim().email().max(200),phone:z.string().trim().regex(/^\+?[\d\s()-]{9,18}$/),street:z.string().max(200).default(''),suburb:z.string().max(100).default(''),city:z.string().max(100).default(''),province:z.string().max(40).default(''),postal:z.string().max(10).default(''),notes:z.string().max(1000).default('')}),method:z.literal('collection'),code:z.string().max(40).default(''),terms:z.literal(true),privacy:z.literal(true),age:z.boolean().optional(),payment:z.literal('preview')});
+export async function quoteOrder(items:CartItem[],method:string,code:string,loungeAccess:LoungeAccessChoice='none'){return calculate(items,method,code,await currentProducts(),loungeAccess);}
+export const orderSchema=z.object({requestId:z.string().uuid(),items:z.array(z.object({productId:z.string(),size:z.enum(['full','half']),quantity:z.number().int().min(1).max(20)})).min(1).max(40),customer:z.object({name:z.string().trim().min(2).max(100),email:z.string().trim().email().max(200),phone:z.string().trim().regex(/^\+?[\d\s()-]{9,18}$/),street:z.string().max(200).default(''),suburb:z.string().max(100).default(''),city:z.string().max(100).default(''),province:z.string().max(40).default(''),postal:z.string().max(10).default(''),notes:z.string().max(1000).default('')}),method:z.literal('collection'),code:z.string().max(40).default(''),loungeAccess:z.enum(['none','day','monthly']).default('none'),terms:z.literal(true),privacy:z.literal(true),age:z.boolean().optional(),payment:z.literal('preview')});
 export async function placeOrder(input:unknown,source:'customer'|'admin',memberId?:string){
  const b=orderSchema.parse(input),db=database(),email=b.customer.email.toLowerCase();
  const existing=await db.prepare('SELECT id,token,email FROM orders WHERE request_id=?').bind(b.requestId).first<{id:string;token:string;email:string}>();
  if(existing){if(existing.email!==email)throw new Error('Please restart checkout.');return {...existing,duplicate:true};}
  if(!settings.demoMode)throw new Error('Online payments are not connected.');if(settings.ageGate&&!b.age)throw new Error('Please confirm the age requirement.');
- let quote:Awaited<ReturnType<typeof quoteOrder>>;try{quote=await quoteOrder(b.items,b.method,b.code);}catch(e){const duplicate=await db.prepare('SELECT id,token,email FROM orders WHERE request_id=?').bind(b.requestId).first<{id:string;token:string;email:string}>();if(duplicate&&duplicate.email===email)return {...duplicate,duplicate:true};throw e;}
+ let quote:Awaited<ReturnType<typeof quoteOrder>>;try{quote=await quoteOrder(b.items,b.method,b.code,b.loungeAccess);}catch(e){const duplicate=await db.prepare('SELECT id,token,email FROM orders WHERE request_id=?').bind(b.requestId).first<{id:string;token:string;email:string}>();if(duplicate&&duplicate.email===email)return {...duplicate,duplicate:true};throw e;}
  const id='AW-'+crypto.randomUUID().slice(0,8).toUpperCase(),token=crypto.randomUUID()+crypto.randomUUID(),now=new Date().toISOString();
  const costs=await db.prepare('SELECT product_id,cost_cents FROM inventory').all<{product_id:string;cost_cents:number|null}>();const costMap=new Map(costs.results.map(r=>[r.product_id,r.cost_cents]));
  const lines=quote.items.map((item,i)=>{const halfUnits=item.quantity*(item.size==='half'?1:2),cost=costMap.get(item.productId);return {id:`${id}:${i}`,productId:item.productId,halfUnits,costCents:cost==null?null:Math.round(cost*halfUnits/2)};});
@@ -32,7 +33,7 @@ export async function placeOrder(input:unknown,source:'customer'|'admin',memberI
  const payload={id,...quote,customer:{...b.customer,email},method:b.method,payment:'Manual confirmation — no online payment collected',status:'pending',demo:true,source,createdAt:now,emailStatus:'not_sent',fulfilment:'Awaiting admin confirmation.'};
  try{await db.batch([
   db.prepare('INSERT INTO orders(id,request_id,email,token,payload,created_at) VALUES(?,?,?,?,?,?)').bind(id,b.requestId,email,token,JSON.stringify(payload),now),
-  db.prepare('INSERT INTO sales(order_id,state,payment_state,source,net_cents,cost_cents,total_cents,revision,updated_at) VALUES(?,?,?,?,?,?,?,?,?)').bind(id,'pending','pending',source,Math.round((quote.subtotal-quote.discount)*100),costCents,Math.round(quote.total*100),0,now),
+  db.prepare('INSERT INTO sales(order_id,state,payment_state,source,net_cents,cost_cents,total_cents,revision,updated_at) VALUES(?,?,?,?,?,?,?,?,?)').bind(id,'pending','pending',source,Math.round((quote.subtotal-quote.discount+quote.loungeAccessFee)*100),costCents,Math.round(quote.total*100),0,now),
   ...(memberId?[db.prepare('INSERT INTO member_orders(order_id,member_id) VALUES(?,?)').bind(id,memberId)]:[]),
   ...lines.map(l=>db.prepare('INSERT INTO order_lines(id,order_id,product_id,half_units,cost_cents) VALUES(?,?,?,?,?)').bind(l.id,id,l.productId,l.halfUnits,l.costCents)),
  ]);}catch(e){const duplicate=await db.prepare('SELECT id,token,email FROM orders WHERE request_id=?').bind(b.requestId).first<{id:string;token:string;email:string}>();if(duplicate&&duplicate.email===email)return {...duplicate,duplicate:true};if(String(e).includes('INSUFFICIENT_STOCK'))throw new Error('Stock changed while you checked out. Refresh your bag and try again.');throw e;}

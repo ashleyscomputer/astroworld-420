@@ -16,6 +16,7 @@ const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 const managedLinux = readExecutionProfile() === "managed-linux";
 
 const localBindingConfig = {
+  name: "astroworld-420",
   main: "./worker/index.ts",
   compatibility_flags: ["nodejs_compat"],
   d1_databases: d1
@@ -35,6 +36,23 @@ const localBindingConfig = {
         },
       ]
     : [],
+  // Worker Previews use their own binding; never point this at production.
+  previews: {
+    vars: {
+      ADMIN_USERNAME: "Mudi",
+    },
+    d1_databases: d1
+      ? [
+          {
+            binding: d1,
+            database_name: "astroworld-420-release-preview",
+            database_id: "908ed519-2d90-4234-a604-639cf226c7d9",
+            migrations_dir: "drizzle",
+            migrations_table: "d1_migrations",
+          },
+        ]
+      : [],
+  },
 };
 
 export default defineConfig(async ({ command }) => {

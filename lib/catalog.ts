@@ -1,3 +1,4 @@
+import {membershipPricing,type LoungeAccessChoice} from './membership-pricing';
 export type Product = { id:string; slug:string; name:string; price:number; tiers:[number,number,number]; glowColor:string; accent:string; shortDescription:string; longDescription:string; stock:number; number:string; image:string; imagePosition?:string; active?:boolean; productRevision?:number; imageRevision?:number; revision?:number; cost?:number|null };
 const tierRates:Record<string,[number,number,number]>={'super-berry':[30,20,20],'white-cheese':[70,60,60],banana:[70,60,60],atomic:[100,90,80],caramel:[130,120,110],rack:[140,130,120],sunset:[150,140,130],cheese:[160,150,140]};
 const productIds=['super-berry','white-cheese','banana','atomic','caramel','rack','sunset','cheese'];
@@ -28,7 +29,7 @@ export function lineTotal(product:Product,size:'full'|'half',quantity:number,ful
  if(size!=='full')throw new Error('Choose a valid portion.');
  let total=0;for(let i=0;i<quantity;i++)total+=product.tiers[Math.min(fullGramsBefore+i,2)];return total;
 }
-export function calculate(items:CartItem[],method='collection',code='',catalogProducts:Product[]=products){
+export function calculate(items:CartItem[],method='collection',code='',catalogProducts:Product[]=products,loungeAccess:LoungeAccessChoice='none'){
  if(!Array.isArray(items)||!items.length||items.length>40)throw new Error('Your bag is empty or contains too many items.');
  const aggregate:Record<string,number>={},fullGrams:Record<string,number>={};
  const lines=items.map(item=>{
@@ -44,5 +45,7 @@ export function calculate(items:CartItem[],method='collection',code='',catalogPr
  const subtotal=Math.round(lines.reduce((sum,item)=>sum+item.total,0)*100)/100;
  const discount=Math.round(subtotal*(settings.discounts[normalized]||0)*100)/100;
  const delivery=0;
- return {items:lines,subtotal,discount,delivery,total:Math.round((subtotal-discount+delivery)*100)/100,code:normalized};
+ const lounge=loungeAccess==='none'?null:{plan:loungeAccess,label:membershipPricing[loungeAccess].label,fee:membershipPricing[loungeAccess].fee};
+ const loungeAccessFee=lounge?.fee||0;
+ return {items:lines,subtotal,discount,delivery,loungeAccess:lounge,loungeAccessFee,total:Math.round((subtotal-discount+delivery+loungeAccessFee)*100)/100,code:normalized};
 }

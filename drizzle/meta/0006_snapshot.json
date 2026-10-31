@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "5f38e3da-2d4a-4e50-a2f9-987654321007",
-  "prevId": "f3ac75d1-55c0-4da2-9391-510f3a56e2f4",
+  "id": "f3ac75d1-55c0-4da2-9391-510f3a56e2f4",
+  "prevId": "54593869-194b-418a-b76c-d7ee0ddfa29c",
   "tables": {
     "admin_sessions": {
       "name": "admin_sessions",
@@ -718,20 +718,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
-        },
-        "requested_plan": {
-          "name": "requested_plan",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "membership_fee_cents": {
-          "name": "membership_fee_cents",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
           "autoincrement": false
         }
       },

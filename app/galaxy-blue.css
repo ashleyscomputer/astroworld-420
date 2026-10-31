@@ -150,3 +150,16 @@ a:hover,.text-link:hover{color:var(--acid)}
  .cosmic-sky:before,.cosmic-stars,.cosmic-stars:before,.cosmic-stars:after,.cosmic-shooting-star{animation:none!important}
  .cosmic-sky:before{opacity:.7}
 }
+
+/* Lounge access is an optional, priced checkout add-on. */
+.lounge-access-picker{margin:24px 0;padding:20px;border:1px solid #56eef433;border-radius:14px;background:linear-gradient(135deg,#0b2940aa,#07182baa)}
+.lounge-access-picker h3{font-size:20px;margin:10px 0 6px}
+.lounge-access-picker>p{font-size:12px;margin-bottom:14px}
+.lounge-access-options{display:grid;gap:9px}
+.lounge-access-options label{display:flex;align-items:center;gap:12px;padding:13px;border:1px solid #8fcaff2b;border-radius:10px;background:#061429a8;cursor:pointer;transition:border-color .2s,background .2s}
+.lounge-access-options label.selected{border-color:#56eef4;background:#56eef410;box-shadow:0 0 16px #56eef414}
+.lounge-access-options input{width:16px;height:16px;flex:none;accent-color:#56eef4}
+.lounge-access-options label>span{display:grid;gap:3px;flex:1}
+.lounge-access-options label strong{font-size:12px}
+.lounge-access-options label small{font-size:10px;color:#a8c2dc}
+.lounge-access-options label>b{font-size:14px;color:#56eef4}

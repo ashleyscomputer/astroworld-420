@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable,
   ScrollView, StatusBar, StyleSheet, Text, View,
@@ -40,6 +40,7 @@ export default function App() {
   });
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const profileRef = useRef<Profile | null>(null);
   const [booting, setBooting] = useState(true);
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<Tab>("Overview");
@@ -200,7 +201,7 @@ export default function App() {
       setPendingProductIds(remaining.map((item) => item.productId));
     } catch (error) {
       const message = error instanceof Error ? error.message : "Could not refresh inventory.";
-      if (isNetworkError(message) && profile) {
+      if (isNetworkError(message) && profileRef.current) {
         const cached = await getCachedProducts();
         if (cached.length) setProducts(cached);
         setConnection("offline");
@@ -215,11 +216,12 @@ export default function App() {
     } finally {
       setBusy(false);
     }
-  }, [session, syncPendingOperations, profile]);
+  }, [session, syncPendingOperations]);
 
   useEffect(() => {
     if (!session) {
       setProfile(null);
+      profileRef.current = null;
       setProducts([]);
       setMovements([]);
       setTeam([]);

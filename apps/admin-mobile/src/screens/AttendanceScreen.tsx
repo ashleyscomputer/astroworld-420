@@ -62,6 +62,7 @@ export default function AttendanceScreen({ isSuperAdmin, qr, history, busy, onIs
   }, [qr]);
 
   const openShift = history.find((shift) => shift.is_open);
+  const totalSeconds = history.reduce((sum, shift) => sum + Math.max(0, shift.duration_seconds), 0);
   const handleBarcode = async (payload: string) => {
     if (scanLock.current || scanBusy) return;
     scanLock.current = true;
@@ -161,6 +162,13 @@ export default function AttendanceScreen({ isSuperAdmin, qr, history, busy, onIs
       </Card>
 
       <Heading title={isSuperAdmin ? "Team attendance" : "My attendance"} hint="Shift records for the last 31 days. Times are recorded by the server." />
+      {history.length > 0 ? (
+        <Card style={styles.hoursSummary}>
+          <Text style={styles.timeLabel}>{isSuperAdmin ? "TEAM HOURS · LAST 31 DAYS" : "YOUR HOURS · LAST 31 DAYS"}</Text>
+          <Text style={styles.hoursTotal}>{durationLabel(totalSeconds)}</Text>
+          <Text style={styles.micro}>{history.length} shift record(s), including open shifts calculated at last refresh.</Text>
+        </Card>
+      ) : null}
       {history.length === 0 ? (
         <Card><Text style={styles.muted}>No attendance shifts recorded yet.</Text></Card>
       ) : history.map((shift) => (
@@ -220,6 +228,8 @@ const styles = StyleSheet.create({
   scanOverlayText: { color: "#FFFFFF", fontSize: 12, fontWeight: "700" },
   scanMessage: { color: colors.accent, fontSize: 11, lineHeight: 17 },
   shiftCard: { gap: 10 },
+  hoursSummary: { borderColor: "rgba(165,139,211,0.28)", backgroundColor: "rgba(165,139,211,0.06)" },
+  hoursTotal: { color: colors.text, fontSize: 30, fontWeight: "900", fontVariant: ["tabular-nums"] },
   rowBetween: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10 },
   employeeName: { color: colors.text, fontSize: 13, fontWeight: "700" },
   shiftBadge: { fontSize: 9, fontWeight: "800", letterSpacing: 1 },

@@ -26,7 +26,7 @@ import SettingsScreen from "./src/screens/SettingsScreen";
 import AttendanceScreen from "./src/screens/AttendanceScreen";
 
 type Tab = "Overview" | "Inventory" | "Attendance" | "Activity" | "Team" | "Settings";
-type OperationKind = "restock" | "adjustment";
+type OperationKind = "restock" | "adjustment" | "threshold";
 type OperationModal = { kind: OperationKind; product: Product } | null;
 
 async function rpc<T = unknown>(name: string, params: Record<string, unknown> = {}): Promise<T> {
@@ -314,6 +314,26 @@ export default function App() {
       return;
     }
 
+    if (operationModal.kind === "threshold") {
+      setBusy(true);
+      try {
+        await rpc("set_low_stock_threshold", {
+          p_product_id: operationModal.product.id,
+          p_threshold_half: quantityHalf,
+          p_revision: operationModal.product.revision,
+        });
+        setNotice("Low-stock alert level updated.");
+        setOperationModal(null);
+        setQuantityGrams("");
+        await refresh();
+      } catch (error) {
+        setNotice(error instanceof Error ? error.message : "Could not update the low-stock alert.");
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
+
     const operation: PendingInventoryOperation = {
       requestId: Crypto.randomUUID(),
       kind: operationModal.kind,
@@ -351,7 +371,7 @@ export default function App() {
       await refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : "Stock change failed.";
-      if (isNetworkError(message)) {
+      if (operation.kind !== "threshold" && isNetworkError(message)) {
         await enqueueInventoryOperation(operation);
         const remaining = await getPendingInventoryOperations();
         setPendingCount(remaining.length);
@@ -427,7 +447,7 @@ export default function App() {
 
   const openOperation = (product: Product, kind: OperationKind) => {
     setOperationModal({ product, kind });
-    setQuantityGrams(kind === "adjustment" ? formatHalfUnitsAsGrams(product.half_units) : "");
+    setQuantityGrams(kind === "adjustment" ? formatHalfUnitsAsGrams(product.half_units) : kind === "threshold" ? formatHalfUnitsAsGrams(product.low_stock_half_units) : "");
     setReason("");
   };
 
@@ -491,6 +511,7 @@ export default function App() {
             pendingProductIds={pendingProductIds}
             onRestock={(product) => openOperation(product, "restock")}
             onAdjust={(product) => openOperation(product, "adjustment")}
+            onThreshold={(product) => openOperation(product, "threshold")}
           />
         );
       case "Attendance":
@@ -596,25 +617,25 @@ export default function App() {
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.modalTitle}>{operationModal?.kind === "restock" ? "Restock product" : "Adjust stock level"}</Text>
+                <Text style={styles.modalTitle}>{operationModal?.kind === "restock" ? "Restock product" : operationModal?.kind === "threshold" ? "Set low-stock alert" : "Adjust stock level"}</Text>
                 <Text style={styles.modalSubtitle}>{operationModal?.product.name}</Text>
               </View>
               <Pressable onPress={() => setOperationModal(null)}><Text style={styles.close}>Close ✕</Text></Pressable>
             </View>
             <Field
-              label={operationModal?.kind === "restock" ? "Quantity to add (g)" : "New stock level (g)"}
+              label={operationModal?.kind === "restock" ? "Quantity to add (g)" : operationModal?.kind === "threshold" ? "Alert threshold (g)" : "New stock level (g)"}
               value={quantityGrams}
               onChange={setQuantityGrams}
               type="decimal-pad"
               placeholder="Example: 2.5"
             />
             <Field
-              label={operationModal?.kind === "restock" ? "Reason (optional)" : "Reason (required)"}
+              label={operationModal?.kind === "restock" ? "Reason (optional)" : operationModal?.kind === "threshold" ? "Note (optional)" : "Reason (required)"}
               value={reason}
               onChange={setReason}
               placeholder="Stock count / delivery / correction"
             />
-            <Text style={styles.modalHint}>Use 0.5 g steps only. The app converts this to integer half-gram units before sending it to the database.</Text>
+            <Text style={styles.modalHint}>Use 0.5 g steps only. The app converts this to integer half-gram units before sending it to the database. Set the alert to 0 g to disable low-stock warnings for this product.</Text>
             <View style={styles.modalActions}>
               <Button title="Cancel" kind="secondary" onPress={() => setOperationModal(null)} />
               <Button title={busy ? "Saving..." : "Confirm change"} disabled={busy || !quantityGrams.trim()} onPress={() => void saveInventoryOperation()} />

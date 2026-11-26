@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, TextInput, View, type ViewStyle } from "react-native";
 import { colors } from "../../theme/colors";
+import { typography } from "../../theme/typography";
 
 type ButtonProps = { title:string; onPress:()=>void; kind?:"primary"|"secondary"|"quiet"|"danger"; small?:boolean; disabled?:boolean };
 export function Button({title,onPress,kind="primary",small=false,disabled=false}:ButtonProps) {

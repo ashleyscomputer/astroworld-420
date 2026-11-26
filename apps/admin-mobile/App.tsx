@@ -423,6 +423,19 @@ export default function App(){
     <Card style={s.syncCard}><Text style={s.cardTitle}>Offline mode</Text><Text style={s.muted}>{queueCount} sale(s) queued locally</Text><Text style={s.micro}>Queued sales are not presented as completed until Supabase accepts them. Retry sync after reconnecting.</Text><Button title="Retry sync" small onPress={()=>void syncQueue().then(refresh)}/></Card>
   </>;
 
+  const renderDialog=()=> <Modal transparent animationType="fade" visible={!!dialog} onRequestClose={()=>setDialog(null)}>
+    <View style={s.dialogBackdrop}>
+      <View style={s.dialogCard}>
+        <Text style={s.modalTitle}>{dialog?.title}</Text>
+        <Text style={s.muted}>{dialog?.message}</Text>
+        <View style={s.row}>
+          {dialog?.onConfirm?<Button title="Not now" kind="secondary" onPress={()=>setDialog(null)}/>:null}
+          <Button title={dialog?.confirmLabel??"Got it"} kind={dialog?.danger?"danger":"primary"} onPress={()=>{const action=dialog?.onConfirm;setDialog(null);action?.();}}/>
+        </View>
+      </View>
+    </View>
+  </Modal>;
+
   if(booting||!fontsLoaded)return <View style={s.loading}><StatusBar barStyle="light-content"/><ActivityIndicator size="large" color={T.green}/><Text style={s.muted}>Opening the control room...</Text></View>;
   if(!session)return <View style={s.login}>
     <StatusBar barStyle="light-content"/><View style={s.loginGlow}/>

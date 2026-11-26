@@ -24,7 +24,16 @@
           "configureAndroidBackup": true
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Astroworld Admin to scan the workplace attendance QR code.",
+          "microphonePermission": "Microphone access is not used.",
+          "recordAudioAndroid": false,
+          "barcodeScannerEnabled": true
+        }
+      ]
     ],
     "web": {
       "bundler": "metro"

@@ -27,5 +27,5 @@ jobs:
         with:
           node-version: "22.13"
       - run: npm install
-      - run: npx expo install --fix
+      - run: npx expo install --check
       - run: npm run typecheck

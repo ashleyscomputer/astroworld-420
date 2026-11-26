@@ -16,6 +16,7 @@ async function db():Promise<SQLite.SQLiteDatabase>{
 export async function cacheProducts(products:Product[]):Promise<void>{
   const database=await db();
   await database.withTransactionAsync(async()=>{
+    await database.runAsync("DELETE FROM cached_products");
     for(const product of products){
       await database.runAsync(
         "INSERT INTO cached_products (id,payload,updated_at) VALUES (?,?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload,updated_at=excluded.updated_at",

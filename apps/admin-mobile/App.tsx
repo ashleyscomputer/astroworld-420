@@ -1,6 +1,6 @@
 import React,{useCallback,useEffect,useMemo,useState} from "react";
 import {
-  ActivityIndicator,Alert,KeyboardAvoidingView,Modal,Platform,Pressable,
+  ActivityIndicator,KeyboardAvoidingView,Modal,Platform,Pressable,
   ScrollView,StatusBar,StyleSheet,Text as NativeText,TextInput,View
 } from "react-native";
 import type { TextProps, TextStyle } from "react-native";
@@ -63,11 +63,13 @@ export default function App(){
   const [modal,setModal]=useState<ModalState>({kind:null});
   const [form,setForm]=useState<Record<string,string>>({});
   const [notice,setNotice]=useState("");
+  const [dialog,setDialog]=useState<{title:string;message:string;confirmLabel?:string;danger?:boolean;onConfirm?:()=>void}|null>(null);
   const superAdmin=profile?.role==="super_admin";
 
   const setField=(key:string,value:string)=>setForm(old=>({...old,[key]:value}));
   const openModal=(kind:ModalKind,extra:Omit<ModalState,"kind">={})=>{setForm({});setModal({kind,...extra});};
   const closeModal=()=>setModal({kind:null});
+  const askToConfirm=(title:string,message:string,confirmLabel:string,onConfirm:()=>void,danger=false)=>setDialog({title,message,confirmLabel,onConfirm,danger});
 
   useEffect(()=>{
     let mounted=true;
@@ -213,14 +215,14 @@ export default function App(){
         case "verifyPass":{
           const result=await rpc<any>("verify_member_pass",{p_token:v.token?.trim()});
           const member=result.member;
-          Alert.alert("Pass: "+String(result.result??"unknown"),member?String(member.full_name)+" · "+String(member.plan??"No active plan")+" · "+String(member.expires_at??"No expiry returned"):"No member details returned.");
+          setDialog({title:"Pass: "+String(result.result??"unknown"),message:member?String(member.full_name)+" · "+String(member.plan??"No active plan")+" · "+String(member.expires_at??"No expiry returned"):"No member details returned."});
           break;
         }
         case "staff":{
           assertSupabaseConfigured();
           const {data,error}=await supabase.functions.invoke("invite-staff",{body:{email:v.email?.trim(),username:v.username?.trim(),full_name:v.full_name?.trim()}});
           if(error)throw new Error(error.message);if(data?.error)throw new Error(data.error);
-          Alert.alert("Invitation sent","Supabase Auth will deliver the staff invitation email.");
+          setDialog({title:"Invitation sent",message:"Supabase Auth will deliver the staff invitation email."});
           break;
         }
         case "expense":
@@ -235,15 +237,12 @@ export default function App(){
 
   const saleAction=(sale:Sale,kind:"cancel"|"refund")=>{
     const question=kind==="refund"?"Refund this sale and restock its items?":"Cancel this unpaid sale and restore its stock?";
-    Alert.alert(kind==="refund"?"Confirm refund":"Confirm cancellation",question,[
-      {text:"Keep",style:"cancel"},
-      {text:kind==="refund"?"Refund":"Cancel sale",style:"destructive",onPress:()=>{
-        setBusy(true);
-        const name=kind==="refund"?"refund_sale":"cancel_sale";
-        const params=kind==="refund"?{p_sale_id:sale.id,p_revision:sale.revision,p_restock:true,p_reason:"Refunded in admin app"}:{p_sale_id:sale.id,p_revision:sale.revision,p_reason:"Cancelled in admin app"};
-        void rpc(name,params).then(refresh).catch(e=>setNotice(e instanceof Error?e.message:"Unable to update sale.")).finally(()=>setBusy(false));
-      }}
-    ]);
+    askToConfirm(kind==="refund"?"Confirm refund":"Confirm cancellation",question,kind==="refund"?"Refund + restock":"Cancel sale",()=>{
+      setBusy(true);
+      const name=kind==="refund"?"refund_sale":"cancel_sale";
+      const params=kind==="refund"?{p_sale_id:sale.id,p_revision:sale.revision,p_restock:true,p_reason:"Refunded in admin app"}:{p_sale_id:sale.id,p_revision:sale.revision,p_reason:"Cancelled in admin app"};
+      void rpc(name,params).then(refresh).catch(e=>setNotice(e instanceof Error?e.message:"Unable to update sale.")).finally(()=>setBusy(false));
+    },true);
   };
 
   const fields=():Array<{key:string;label:string;type?:"default"|"email-address"|"numeric"|"decimal-pad"|"phone-pad"}>=>{
@@ -373,7 +372,7 @@ export default function App(){
           <Button title="Prices" small kind="secondary" onPress={()=>inventoryModal("prices",p)}/>
           <Button title="Threshold" small kind="secondary" onPress={()=>inventoryModal("threshold",p)}/>
           <Button title="Cost" small kind="quiet" onPress={()=>inventoryModal("cost",p)}/>
-          {p.half_units===0?<Button title="Retire" small kind="danger" onPress={()=>Alert.alert("Retire product?",p.name+" will be hidden from new sales. Historical sale records remain.",[{text:"Keep",style:"cancel"},{text:"Retire",style:"destructive",onPress:()=>void rpc("retire_product",{p_product_id:p.id,p_revision:p.revision}).then(refresh).catch(e=>setNotice(e.message))}])}/>:null}
+          {p.half_units===0?<Button title="Retire" small kind="danger" onPress={()=>askToConfirm("Retire product?",p.name+" will be hidden from new sales. Historical sale records remain.","Retire",()=>void rpc("retire_product",{p_product_id:p.id,p_revision:p.revision}).then(refresh).catch(e=>setNotice(e.message)),true)}/>:null}
         </View>:<Text style={s.micro}>Staff view · Super Admin manages inventory and pricing.</Text>}
       </Card>;
     })}
@@ -391,9 +390,9 @@ export default function App(){
           <Button title="Approve · monthly" small kind="secondary" onPress={()=>void rpc("approve_member",{p_member_id:member.id,p_plan:"monthly"}).then(refresh).catch(e=>setNotice(e.message))}/>
         </>:null}
         {member.status==="active"?<>
-          <Button title="Issue QR pass" small onPress={()=>{setBusy(true);void rpc<any>("issue_member_pass",{p_member_id:member.id}).then(result=>Alert.alert("Pass issued","One-time token. It is only revealed once:\n\n"+String(result.token??"Token unavailable"))).catch(e=>setNotice(e.message)).finally(()=>setBusy(false));}}/>
+          <Button title="Issue QR pass" small onPress={()=>{setBusy(true);void rpc<any>("issue_member_pass",{p_member_id:member.id}).then(result=>setDialog({title:"Pass issued",message:"One-time token. It is only revealed once:\n\n"+String(result.token??"Token unavailable")})).catch(e=>setNotice(e.message)).finally(()=>setBusy(false));}}/>
           <Button title="Agreement" small kind="secondary" onPress={()=>openModal("agreement",{member})}/>
-          <Button title="Disable" small kind="danger" onPress={()=>Alert.alert("Disable member?","This revokes membership access.",[{text:"Keep",style:"cancel"},{text:"Disable",style:"destructive",onPress:()=>void rpc("disable_member",{p_member_id:member.id}).then(refresh).catch(e=>setNotice(e.message))}])}/>
+          <Button title="Disable" small kind="danger" onPress={()=>askToConfirm("Disable member?","This revokes membership access.","Disable",()=>void rpc("disable_member",{p_member_id:member.id}).then(refresh).catch(e=>setNotice(e.message)),true)}/>
         </>:null}
       </View>
     </Card>)}
@@ -414,11 +413,24 @@ export default function App(){
       <Heading title="Staff accounts"/>
       {staff.map(person=><Card key={person.id} style={s.compact}>
         <View style={s.rowBetween}><View><Text style={s.cardTitle}>{person.full_name||person.username}</Text><Text style={s.muted}>{person.username} · {person.role}</Text></View><Text style={person.active?s.paid:s.low}>{person.active?"ACTIVE":"DISABLED"}</Text></View>
-        {person.role!=="super_admin"?<Button title={person.active?"Deactivate":"Reactivate"} small kind="secondary" onPress={()=>Alert.alert("Update staff access?","The database will enforce this change on the next request.",[{text:"Back",style:"cancel"},{text:"Continue",onPress:()=>void rpc("set_staff_active",{p_user_id:person.id,p_active:!person.active}).then(refresh).catch(e=>setNotice(e.message))}])}/>:null}
+        {person.role!=="super_admin"?<Button title={person.active?"Deactivate":"Reactivate"} small kind="secondary" onPress={()=>askToConfirm("Update staff access?","The database will enforce this change on the next request.","Continue",()=>void rpc("set_staff_active",{p_user_id:person.id,p_active:!person.active}).then(refresh).catch(e=>setNotice(e.message)))}/>:null}
       </Card>)}
     </>:<Card><Text style={s.muted}>Staff access is limited to day-to-day sales, inventory visibility and member operations.</Text></Card>}
     <Card style={s.syncCard}><Text style={s.cardTitle}>Offline mode</Text><Text style={s.muted}>{queueCount} sale(s) queued locally</Text><Text style={s.micro}>Queued sales are not presented as completed until Supabase accepts them. Retry sync after reconnecting.</Text><Button title="Retry sync" small onPress={()=>void syncQueue().then(refresh)}/></Card>
   </>;
+
+  const renderDialog=()=> <Modal transparent animationType="fade" visible={!!dialog} onRequestClose={()=>setDialog(null)}>
+    <View style={s.dialogBackdrop}>
+      <View style={s.dialogCard}>
+        <Text style={s.modalTitle}>{dialog?.title}</Text>
+        <Text style={s.muted}>{dialog?.message}</Text>
+        <View style={s.row}>
+          {dialog?.onConfirm?<Button title="Not now" kind="secondary" onPress={()=>setDialog(null)}/>:null}
+          <Button title={dialog?.confirmLabel??"Got it"} kind={dialog?.danger?"danger":"primary"} onPress={()=>{const action=dialog?.onConfirm;setDialog(null);action?.();}}/>
+        </View>
+      </View>
+    </View>
+  </Modal>;
 
   if(booting||!fontsLoaded)return <View style={s.loading}><StatusBar barStyle="light-content"/><ActivityIndicator size="large" color={T.green}/><Text style={s.muted}>Opening the control room...</Text></View>;
   if(!session)return <View style={s.login}>
@@ -444,6 +456,7 @@ export default function App(){
     </ScrollView>
     <View style={s.tabBar}>{tabs.map(item=>{const icon=({Home:"grid",Sales:"cart",Inventory:"cube",Members:"people",More:"ellipsis-horizontal"} as const)[item];const active=tab===item;return <Pressable key={item} accessibilityRole="button" accessibilityState={{selected:active}} onPress={()=>setTab(item)} style={s.tabItem}><Ionicons name={icon as any} size={20} color={active?T.green:"#777181"}/><Text style={[s.tabLabel,active&&s.tabLabelActive]}>{item}</Text></Pressable>;})}</View>
     {renderModal()}
+    {renderDialog()}
   </View>;
 }
 
@@ -497,5 +510,7 @@ const s=StyleSheet.create({
   tabLabel:{fontSize:10,color:"#A6A2B1",fontWeight:"700"},tabLabelActive:{color:T.text},
   modalBackdrop:{flex:1,justifyContent:"flex-end",backgroundColor:"rgba(0,0,0,0.72)"},
   modalCard:{backgroundColor:T.surface,padding:20,borderTopLeftRadius:24,borderTopRightRadius:24,borderColor:T.line,borderWidth:1,gap:14,maxHeight:"90%"},
-  modalTitle:{color:T.text,fontSize:21,fontWeight:"800"}
+  modalTitle:{color:T.text,fontSize:21,fontWeight:"800"},
+  dialogBackdrop:{flex:1,justifyContent:"center",alignItems:"center",padding:22,backgroundColor:"rgba(5,4,8,0.78)"},
+  dialogCard:{width:"100%",maxWidth:440,backgroundColor:"#1D1826",borderWidth:1,borderColor:"rgba(241,240,232,0.10)",borderRadius:22,padding:22,gap:16}
 });

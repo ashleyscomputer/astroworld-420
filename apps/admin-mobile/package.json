@@ -30,7 +30,8 @@
     "expo-camera": "~58.0.14",
     "expo-crypto": "~58.0.8",
     "react-native-svg": "15.16.0",
-    "react-native-qrcode-svg": "^6.3.55"
+    "react-native-qrcode-svg": "^6.3.55",
+    "expo-font": "~58.0.12"
   },
   "devDependencies": {
     "@types/react": "~19.3.0",

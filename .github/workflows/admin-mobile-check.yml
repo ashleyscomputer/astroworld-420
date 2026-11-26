@@ -39,6 +39,8 @@ jobs:
       - run: npm install
       - run: npx expo install --check
       - run: npm run typecheck
+      - name: Test integer half-gram inventory conversions
+        run: npm run test:inventory
       - name: Export Android bundle
         run: npx expo export --platform android
       - name: Export iOS bundle

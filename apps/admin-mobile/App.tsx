@@ -140,6 +140,7 @@ export default function App() {
       }
 
       const me = person as Profile;
+      profileRef.current = me;
       setProfile(me);
 
       // Retry queued writes before fetching the authoritative stock snapshot.

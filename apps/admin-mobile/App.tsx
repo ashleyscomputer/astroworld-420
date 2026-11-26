@@ -207,7 +207,8 @@ export default function App(){
           break;
         case "verifyPass":{
           const result=await rpc<any>("verify_member_pass",{p_token:v.token?.trim()});
-          Alert.alert("Pass: "+String(result.status??"unknown"),result.name?result.name+" · "+String(result.plan??""):"No member details returned.");
+          const member=result.member;
+          Alert.alert("Pass: "+String(result.result??"unknown"),member?String(member.full_name)+" · "+String(member.plan??"No active plan")+" · "+String(member.expires_at??"No expiry returned"):"No member details returned.");
           break;
         }
         case "staff":{

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import QRCode from "react-native-qrcode-svg";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { Button, Card, Heading } from "../components/ui/Primitives";
 import { colors } from "../theme/colors";
 import type { AttendanceQr, AttendanceShift } from "../types";
@@ -14,6 +14,10 @@ type Props = {
   onIssueQr: () => void;
   onScan: (payload: string) => Promise<string>;
 };
+
+function formatSast(value: string): string {
+  return new Intl.DateTimeFormat("en-ZA", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Johannesburg" }).format(new Date(value));
+}
 
 function durationLabel(seconds: number): string {
   const safe = Math.max(0, Math.floor(seconds));
@@ -72,7 +76,7 @@ export default function AttendanceScreen({ isSuperAdmin, qr, history, busy, onIs
         <Card style={styles.openShift}>
           <Text style={styles.eyebrow}>CURRENT SHIFT</Text>
           <Text style={styles.shiftState}>You are clocked in</Text>
-          <Text style={styles.muted}>Started {new Date(openShift.clock_in_at).toLocaleString()}</Text>
+          <Text style={styles.muted}>Started {formatSast(openShift.clock_in_at)}</Text>
           <Text style={styles.micro}>Scan a fresh workplace QR when you finish your shift.</Text>
         </Card>
       ) : (
@@ -159,11 +163,11 @@ export default function AttendanceScreen({ isSuperAdmin, qr, history, busy, onIs
           <View style={styles.times}>
             <View style={{ flex: 1 }}>
               <Text style={styles.timeLabel}>CLOCK IN</Text>
-              <Text style={styles.timeValue}>{new Date(shift.clock_in_at).toLocaleString()}</Text>
+              <Text style={styles.timeValue}>{formatSast(shift.clock_in_at)}</Text>
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.timeLabel}>CLOCK OUT</Text>
-              <Text style={styles.timeValue}>{shift.clock_out_at ? new Date(shift.clock_out_at).toLocaleString() : "Not clocked out"}</Text>
+              <Text style={styles.timeValue}>{shift.clock_out_at ? formatSast(shift.clock_out_at) : "Not clocked out"}</Text>
             </View>
           </View>
           <View style={styles.rowBetween}>

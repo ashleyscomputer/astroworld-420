@@ -422,7 +422,7 @@ export default function App(){
 
   const tabs:Tab[]=["Home","Sales","Inventory","Members","More"];
   return <View style={s.app}>
-    <StatusBar barStyle="light-content" backgroundColor={T.bg}/>
+    <StatusBar barStyle="light-content"/>
     <View style={s.topBar}><View><Text style={s.brand}>ASTROWORLD <Text style={{color:T.green}}>420</Text></Text><Text style={s.topSub}>{superAdmin?"SUPER ADMIN":"STAFF"} · PRIVATE ADMIN</Text></View><Pressable onPress={()=>void refresh().catch(e=>setNotice(e.message))} style={s.avatar}><Text style={s.avatarText}>{(profile?.full_name||profile?.username||"A").slice(0,1).toUpperCase()}</Text></Pressable></View>
     {notice?<Pressable onPress={()=>setNotice("")} style={s.notice}><Text style={s.noticeText}>{notice}  ×</Text></Pressable>:null}
     {busy?<View style={s.busyLine}><ActivityIndicator size="small" color={T.green}/><Text style={s.micro}>Syncing...</Text></View>:null}

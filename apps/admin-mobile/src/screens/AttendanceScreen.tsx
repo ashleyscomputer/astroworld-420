@@ -35,6 +35,20 @@ export default function AttendanceScreen({ isSuperAdmin, qr, history, busy, onIs
   const scanLock = useRef(false);
 
   useEffect(() => {
+    if (!isSuperAdmin) return;
+    if (!qr) {
+      onIssueQr();
+      return;
+    }
+    const refreshInMs = Math.max(
+      1000,
+      new Date(qr.expires_at).getTime() - Date.now() - 15000
+    );
+    const rotation = setTimeout(onIssueQr, refreshInMs);
+    return () => clearTimeout(rotation);
+  }, [isSuperAdmin, qr?.payload, onIssueQr]);
+
+  useEffect(() => {
     if (!qr) {
       setRemainingSeconds(0);
       return;
@@ -91,7 +105,7 @@ export default function AttendanceScreen({ isSuperAdmin, qr, history, busy, onIs
           <View style={styles.qrHeader}>
             <View style={{ flex: 1 }}>
               <Text style={styles.cardTitle}>Workplace QR station</Text>
-              <Text style={styles.muted}>Display this code at the staff entrance or shared time-clock tablet.</Text>
+              <Text style={styles.muted}>Display this code at the staff entrance or shared time-clock tablet. The code rotates automatically.</Text>
             </View>
             <View style={styles.adminPill}><Text style={styles.adminPillText}>ADMIN</Text></View>
           </View>

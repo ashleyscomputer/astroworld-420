@@ -12,12 +12,12 @@ Apply migrations in numeric order in the Supabase SQL Editor or through the proj
 
 For an existing project that has already applied Step 1 migrations 0001-0004, apply:
 
-1. `0005_mobile_sale_rpc_hardening.sql`
+1. `0005_mobile_sale_rpc_hardening.sql` (numbered no-op; retained for history compatibility)
 2. `0006_inventory_idempotency.sql`
 3. `0007_staff_attendance.sql`
 4. `0008_restore_legacy_client_sales_rpcs.sql`
 
-Migration 0008 restores the original authenticated access to the legacy sales RPCs. This preserves the separate client-facing system after the temporary mobile-only restriction in 0005. The inventory app itself does not call sales, checkout, payment, member, or finance RPCs.
+The customer-facing system is separate. The current 0005 migration is intentionally a no-op. Migration 0008 idempotently re-grants the original authenticated sales RPC permissions in case an earlier draft of 0005 was already applied. The inventory app itself does not call sales, checkout, payment, member, or finance RPCs.
 
 Do not re-run a migration that Supabase has already recorded as applied. Check the migration history first. Never put a service-role key in the mobile app.
 

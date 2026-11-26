@@ -40,7 +40,7 @@ Expo SDK 58 targets React Native 0.88 and React 19.3. Expo's SDK reference lists
 
 ## Supabase setup
 
-For a project that already has Step 1 migrations 0001-0003 and this branch's 0004 applied, apply these migrations in order:
+Keep the original Step 1 schema, functions and security migrations (0001-0003) as they are. Migration 0004 is a legacy sales/payment extension and is not required by this inventory app. Do not apply it solely for this app; if it has already been applied, leave it untouched. Then apply these migrations in order:
 
 1. `0005_mobile_sale_rpc_hardening.sql` is a no-op retained for migration-history compatibility.
 2. `0006_inventory_idempotency.sql` adds role-gated, request-ID idempotent stock operations and the staff-safe movement feed.

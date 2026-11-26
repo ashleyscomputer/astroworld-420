@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, TextInput, View, type ViewStyle } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View, type StyleProp, type ViewStyle } from "react-native";
 import { colors } from "../../theme/colors";
 import { typography } from "../../theme/typography";
 
@@ -13,7 +13,7 @@ type FieldProps = {label:string;value:string;onChange:(value:string)=>void;place
 export function Field({label,value,onChange,placeholder,type="default",secure=false}:FieldProps) {
   return <View style={styles.field}><Text style={styles.fieldLabel}>{label}</Text><TextInput value={value} onChangeText={onChange} placeholder={placeholder??label} placeholderTextColor={colors.muted} keyboardType={type} secureTextEntry={secure} autoCapitalize={type==="email-address"?"none":"sentences"} style={styles.input}/></View>;
 }
-export function Card({children,style}:{children:React.ReactNode;style?:ViewStyle}) {
+export function Card({children,style}:{children:React.ReactNode;style?:StyleProp<ViewStyle>}) {
   return <View style={[styles.card,style]}>{children}</View>;
 }
 export function Heading({title,hint}:{title:string;hint?:string}) {

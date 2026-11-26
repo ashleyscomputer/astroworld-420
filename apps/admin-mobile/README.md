@@ -1,84 +1,129 @@
-# Astroworld Admin Mobile
+# Astroworld 420 Inventory Admin
 
-Android-first internal admin app using Expo, React Native, TypeScript and Supabase. The iOS target is retained in Expo config. This is a separate codebase folder and does not import the website UI or use the website Cloudflare D1 database. Step 1's Admin data belongs in a separate Supabase Postgres project.
+Private Android and iOS application for internal stock and staff operations. Built with Expo SDK 58, React Native, TypeScript, Supabase Auth/Postgres, SQLite and Expo SecureStore.
 
-## Included in this foundation
+This app is deliberately **not** the customer-facing website or checkout system. It does not contain customer POS, sales, payments, memberships, customer accounts, or website UI. Those remain separate systems and are not imported into this app.
 
-- Private email/password sign-in. No public registration.
-- Active profile and database role check after sign-in.
-- Staff and Super Admin experiences. Database RLS and role-checked functions remain authoritative.
-- Dashboard metrics from ops_summary() and Super Admin financial summaries from financial_summary().
-- POS cart with tier-price estimate and server-authoritative checkout through record_sale_with_payment().
-- Recent sales, payment recording, cancellation, and Super Admin refund/restock.
-- Inventory views and Super Admin stock, price, threshold, cost, product-create and product-retire actions.
-- Member creation, approval, disable, agreement capture, pass issue and manual pass-token verification.
-- Super Admin staff invitations through a JWT-verified Supabase Edge Function.
-- Persistent SQLite inventory cache and idempotent offline sale queue.
-- Dark UI with emerald green and purple accents.
+## Scope
+
+- Private email/password sign-in, active profile check and Staff / Super Admin roles.
+- Inventory dashboard with stock-on-hand and low-stock alerts.
+- Search active products from the existing catalogue.
+- Staff read-only stock visibility.
+- Super Admin restock, stock adjustment with reason, and low-stock threshold updates.
+- Append-only stock movement history.
+- Offline inventory snapshot cache and idempotent pending restock/adjustment queue.
+- Staff invitation and account activation/deactivation.
+- QR workplace attendance: Super Admin displays a rotating 90-second QR; each employee signs into their own account and scans it to clock in or out.
+- Personal/team shift history and tracked-hours summary.
+- Dark, mobile-first interface with shared theme and reusable UI primitives.
+
+Product catalogue identity and product/customer pricing remain controlled by the separate business system. This app reads active product names and IDs and manages only internal stock quantities and stock thresholds.
+
+## Data rules
+
+- Stock is always stored in PostgreSQL as an integer count of half-gram units: 0.5 g = 1 unit and 1 g = 2 units.
+- The app accepts only whole-gram or half-gram values and converts them to integer units before making database calls.
+- No floating-point stock calculation is used.
+- Offline changes are labelled pending and are not presented as confirmed stock until the server accepts them.
+- Restock and adjustment requests carry a stable UUID idempotency key. A retry uses the same request ID to avoid applying a stock movement twice.
+- Adjustments use row revisions. A stale adjustment is rejected rather than overwriting a more recent stock level.
 
 ## Prerequisites
 
-- Node.js 22.13 or newer for Expo SDK 58.
-- A Supabase project dedicated to the Admin app.
-- The Step 1 SQL files from astroworld-admin-step1.zip.
+- Node.js 22.13.x for Expo SDK 58.
+- An Expo account for EAS cloud builds.
+- A Supabase project configured with the Step 1 schema and functions.
+- Android device for APK preview and registered iOS devices plus Apple Developer account for ad-hoc iOS preview builds.
+
+Expo SDK 58 targets React Native 0.88 and React 19.3. Expo's SDK reference lists Node 22.13.x for this SDK family. See the [SDK reference](https://docs.expo.dev/versions/v58.0.0/).
 
 ## Supabase setup
 
-1. Create a Supabase project and keep public sign-ups disabled in Authentication.
-2. Run Step 1 migrations in this order: 0001_schema.sql, 0002_functions.sql, 0003_security.sql.
-3. Apply supabase/migrations/0004_mobile_admin.sql from this repository.
-4. Create the first Auth user in Supabase Authentication, then run Step 1 bootstrap_super_admin.sql with that user's UUID.
-5. Deploy the Edge Function with: supabase functions deploy invite-staff
-6. Ensure the platform-provided SUPABASE_URL, SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY secrets are available to the function. The service-role key must never be put in the mobile app.
+For a project that already has Step 1 migrations 0001-0003 and this branch's 0004 applied, apply these migrations in order:
 
-The mobile migration is additive. Never rewrite or casually rerun already-applied Step 1 migrations.
+1. `0005_mobile_sale_rpc_hardening.sql` is a no-op retained for migration-history compatibility.
+2. `0006_inventory_idempotency.sql` adds role-gated, request-ID idempotent stock operations and the staff-safe movement feed.
+3. `0007_staff_attendance.sql` adds short-lived QR attendance, clock-in/out records and role-filtered history.
+4. `0008_restore_legacy_client_sales_rpcs.sql` preserves the original authenticated access to the separate customer system's legacy sales/payment functions.
 
-## Local app setup
+Do not re-run a migration that has already been applied. Inspect the Supabase migration history first. The current mobile app does not call sales, checkout, payment, member, or financial RPCs.
+
+Create the first Auth user, then bootstrap it as Super Admin using the original Step 1 setup instructions. Keep public sign-ups disabled. Deploy the existing staff invitation function:
+
+~~~bash
+supabase functions deploy invite-staff
+~~~
+
+The Edge Function receives its Supabase service-role key from server-side function secrets. The service-role key must never be put in the mobile app, the EAS client environment, or Git.
+
+## Local development
 
 ~~~bash
 cd apps/admin-mobile
 cp .env.example .env
-# Fill in the Supabase project URL and anon/publishable key.
+# Add only the Supabase project URL and anon/publishable key.
 npm install
-npx expo install --fix
+npx expo install --check
 npm run typecheck
+npm run test:inventory
 npx expo start
 ~~~
 
-Scan the Expo Go QR code on Android or press a for an Android emulator. iOS can be used later. For a production build, configure the EAS project and use the preview or production build profile.
+For the browser preview:
+
+~~~bash
+npx expo start --web --port 8082 -c
+~~~
+
+The web preview is useful for layout and workflow testing, but it is not a replacement for native Android/iOS builds or camera testing.
 
 ## Offline behaviour
 
-The app caches the last successfully loaded product list locally. A sale that cannot reach the network is stored in SQLite with a stable UUID request ID. Retrying sync sends the same request ID to Postgres, where the Step 1 idempotency guard prevents duplicate stock deduction.
+The app caches the last successfully loaded active product and stock snapshot in SQLite. If a Super Admin is already signed in and a stock operation encounters a network failure, it is stored locally with a request ID and the identity of the creating account. On reconnect, the app sends it to the role-gated idempotent RPC using the same request ID.
 
-A queued sale is not a confirmed sale: it is not counted as revenue, is not marked paid on the server and does not reserve stock until Postgres accepts it. The database calculates the final total and validates stock. If stock changes before sync, the queue item remains with an error for staff to resolve rather than being silently discarded.
+The server remains authoritative. Stock changes do not appear as confirmed until accepted by PostgreSQL. A stale adjustment or permission failure remains pending with an error rather than being silently discarded. A queued operation from another account is not sent under the currently signed-in account.
 
-## Integration notes
+## Staff attendance
 
-- New paid sales record cash or card. Existing historical paid rows remain NULL because their payment type is not known.
-- Sale creation and optional payment are performed in one database transaction.
-- Product costs and profit remain Super Admin only.
-- The Step 1 member-pass RPC returns the plaintext token at issuance and stores only its hash. Current mobile UI reveals the token once and supports manual token verification. Native camera scanning and QR rendering remain a follow-up.
-- No real Supabase project or staff accounts have been configured from this repository.
+- Super Admin generates the workplace QR from the Attendance screen.
+- The code rotates before its 90-second expiry and the backend stores only its SHA-256 hash.
+- Each employee must sign in with their own active profile and scan the displayed code using their own phone.
+- First valid scan starts a shift; the next scan of a fresh code ends it.
+- Each code can be redeemed once per employee, and server timestamps are authoritative.
+- Staff can see their own history. Super Admin can view the team's history and total hours for the last 31 days.
 
-## Security notes
+The attendance tracker does not currently apply break deductions, overtime, public-holiday rules, payroll approvals, biometric checks, geofencing, or manual correction of missed clock-outs. Agree those policies before treating attendance as payroll evidence.
 
-The mobile client uses only the public anon/publishable key. RLS and Step 1's role-checked SQL functions enforce access. Hiding a button is not an authorisation control. invite-staff checks the caller JWT and active Super Admin profile before using SUPABASE_SERVICE_ROLE_KEY on the server.
-## Browser preview in VS Code (GitHub Codespaces)
+## Native demo builds
 
-The repository can be previewed in a browser through Expo Web. The browser adapter uses tab-scoped session storage for preview; this is not equivalent to native Keychain/Android Keystore protection and is not a recommendation to deploy the admin console as a public website.
-
-1. Open the repository branch in GitHub Codespaces (not the lightweight github.dev editor).
-2. Open the terminal and run:
+See [DEMO_AND_RELEASE_RUNBOOK.md](./DEMO_AND_RELEASE_RUNBOOK.md) for complete setup. Quick commands after linking the EAS project and adding preview environment variables:
 
 ~~~bash
-cd apps/admin-mobile
-npm install
-npx expo install --check
-npx expo start --web --port 8081
+npx eas-cli@latest build --platform android --profile preview
+npx eas-cli@latest device:create
+npx eas-cli@latest build --platform ios --profile preview
 ~~~
 
-3. In the Ports panel, forward port 8081 and open the forwarded URL. The Expo CLI may also display a browser preview URL.
-4. Add the Supabase URL and public anon/publishable key to a local .env file to sign in. Do not add a service-role key to this app.
+Android preview is an installable APK. iOS ad-hoc preview requires every tester device to be registered before the build. For broader client distribution, use TestFlight/App Store Connect instead.
 
-The web preview uses expo-sqlite's WebAssembly build. metro.config.js adds WASM asset support and the COEP/COOP headers required for SharedArrayBuffer. Native Android/iOS builds continue using OS secure storage and native SQLite.
+## Security boundaries
+
+- The mobile app uses only Supabase anon/publishable client keys.
+- RLS and server-side role checks are the authorisation boundary. Hiding controls in the UI is not security.
+- Inventory request payloads and attendance QR tokens are not directly readable from authenticated client tables.
+- Movement history omits cost and financial fields.
+- Staff attendance history is restricted to the employee's own profile; Super Admin can view the team.
+- Website source, website deployments and Cloudflare D1 are outside this app's code path.
+
+## Verification
+
+GitHub Actions validates dependency compatibility, TypeScript, integer stock-unit tests, Android/iOS/web bundle exports and Expo Doctor. These checks validate build bundles, not real device installation or camera behaviour.
+
+The pgTAP checks are in `supabase/tests/inventory_attendance_permissions.test.sql`. Run them against a test Supabase database after applying the migrations:
+
+~~~bash
+supabase test db
+~~~
+
+The SQL permission suite has not been executed against the client's live database as part of this code push. Complete the demo acceptance checklist in the runbook on physical Android and iOS devices before client handover.

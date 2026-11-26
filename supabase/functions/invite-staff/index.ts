@@ -44,7 +44,7 @@ Deno.serve(async(request:Request)=>{
     const email=String(body.email??"").trim().toLowerCase();
     const username=String(body.username??"").trim();
     const fullName=String(body.full_name??"").trim();
-    if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email))return json({error:"A valid email is required"},400);
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return json({error:"A valid email is required"},400);
     if(!/^[a-zA-Z0-9._-]{3,40}$/.test(username))return json({error:"Username must be 3-40 characters using letters, numbers, dot, underscore or hyphen"},400);
     if(fullName.length<2||fullName.length>100)return json({error:"Full name must be 2-100 characters"},400);
 

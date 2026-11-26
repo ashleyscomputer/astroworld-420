@@ -16,7 +16,7 @@ type Tab="Home"|"Sales"|"Inventory"|"Members"|"More";
 type ModalKind="payment"|"restock"|"adjust"|"prices"|"threshold"|"cost"|"newProduct"|"newMember"|"agreement"|"verifyPass"|"staff"|"expense"|null;
 type ModalState={kind:ModalKind;product?:Product;sale?:Sale;member?:Member};
 const money=(c:number|null|undefined)=>"R "+(Number(c??0)/100).toFixed(2);
-const grams=(u:number)=>String(u/2).replace(/\\.0$/,"");
+const grams=(u:number)=>String(u/2).replace(/\.0$/,"");
 const today=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");};
 const monthStart=()=>today().slice(0,8)+"01";
 const uuid=()=>"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.floor(Math.random()*16);return(c==="x"?r:(r&3)|8).toString(16);});
@@ -30,8 +30,8 @@ async function rpc<T=any>(name:string,params:Record<string,unknown>={}):Promise<
 function Button({title,onPress,kind="primary",small=false,disabled=false}:{title:string;onPress:()=>void;kind?:"primary"|"secondary"|"quiet"|"danger";small?:boolean;disabled?:boolean}){
   return <Pressable disabled={disabled} onPress={onPress} style={[s.button,small&&s.buttonSmall,kind==="primary"&&s.primary,kind==="secondary"&&s.secondary,kind==="quiet"&&s.quiet,kind==="danger"&&s.danger,disabled&&s.disabled]}><Text style={[s.buttonText,kind==="quiet"&&{color:T.muted}]}>{title}</Text></Pressable>;
 }
-function Field({label,value,onChange,placeholder,type="default"}:{label:string;value:string;onChange:(v:string)=>void;placeholder?:string;type?:"default"|"email-address"|"numeric"|"decimal-pad"|"phone-pad"}){
-  return <View style={s.field}><Text style={s.fieldLabel}>{label}</Text><TextInput value={value} onChangeText={onChange} placeholder={placeholder??label} placeholderTextColor="#637181" keyboardType={type} autoCapitalize={type==="email-address"?"none":"sentences"} style={s.input}/></View>;
+function Field({label,value,onChange,placeholder,type="default",secure=false}:{label:string;value:string;onChange:(v:string)=>void;placeholder?:string;type?:"default"|"email-address"|"numeric"|"decimal-pad"|"phone-pad";secure?:boolean}){
+  return <View style={s.field}><Text style={s.fieldLabel}>{label}</Text><TextInput value={value} onChangeText={onChange} placeholder={placeholder??label} placeholderTextColor="#637181" keyboardType={type} secureTextEntry={secure} autoCapitalize={type==="email-address"?"none":"sentences"} style={s.input}/></View>;
 }
 function Card({children,style}:{children:React.ReactNode;style?:any}){return <View style={[s.card,style]}>{children}</View>;}
 function Heading({title,hint}:{title:string;hint?:string}){return <View style={s.heading}><Text style={s.headingText}>{title}</Text>{hint?<Text style={s.muted}>{hint}</Text>:null}</View>;}
@@ -197,7 +197,7 @@ export default function App(){
           if(current.product)await rpc("set_product_cost",{p_product_id:current.product.id,p_cost_per_gram_cents:v.cost===""?null:Math.round(Number(v.cost)*100)});
           break;
         case "newProduct":
-          await rpc("create_product",{p_product_id:v.id?.trim().toLowerCase().replace(/\\s+/g,"-"),p_name:v.name?.trim(),p_sort_order:Number(v.sort_order||products.length+1),p_price1_cents:Math.round(Number(v.price1)*100),p_price2_cents:Math.round(Number(v.price2)*100),p_price3_cents:Math.round(Number(v.price3)*100),p_low_stock_half_units:Math.round(Number(v.threshold_g||10)*2)});
+          await rpc("create_product",{p_product_id:v.id?.trim().toLowerCase().replace(/\s+/g,"-"),p_name:v.name?.trim(),p_sort_order:Number(v.sort_order||products.length+1),p_price1_cents:Math.round(Number(v.price1)*100),p_price2_cents:Math.round(Number(v.price2)*100),p_price3_cents:Math.round(Number(v.price3)*100),p_low_stock_half_units:Math.round(Number(v.threshold_g||10)*2)});
           break;
         case "newMember":
           await rpc("create_member",{p_full_name:v.full_name?.trim(),p_phone:v.phone?.trim()||"",p_email:v.email?.trim()||""});
@@ -414,7 +414,7 @@ export default function App(){
     <Text style={s.heroSub}>Private operations console. Staff accounts are invited by a Super Admin.</Text>
     {!supabaseConfigured?<Card><Text style={s.warning}>Supabase is not configured. Copy .env.example to .env and add the project URL and anon/publishable key.</Text></Card>:null}
     <Field label="Email" value={email} onChange={setEmail} placeholder="admin@example.com" type="email-address"/>
-    <Field label="Password" value={password} onChange={setPassword} placeholder="Password"/>
+    <Field label="Password" value={password} onChange={setPassword} placeholder="Password" secure/>
     <Button title={busy?"Signing in...":"Sign in"} disabled={busy||!supabaseConfigured} onPress={()=>{setBusy(true);void supabase.auth.signInWithPassword({email:email.trim(),password}).then(({error})=>{if(error)setNotice(error.message);}).catch(e=>setNotice(e instanceof Error?e.message:"Sign in failed.")).finally(()=>setBusy(false));}}/>
     {notice?<Text style={s.warning}>{notice}</Text>:null}
     <Text style={s.micro}>No public registration. Your active profile and role are checked in Postgres after login.</Text>

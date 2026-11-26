@@ -5,7 +5,7 @@ import { colors } from "../theme/colors";
 import type { StockMovement } from "../types";
 import { formatHalfUnitsAsGrams } from "../lib/inventory-format";
 
-type Props = { movements: StockMovement[]; loading: boolean; onRefresh: () => void };
+type Props = { movements: StockMovement[]; loading: boolean };
 
 function movementLabel(kind: StockMovement["kind"]): string {
   switch (kind) {

@@ -1,9 +1,33 @@
 {
-  "expo":{
-    "name":"Astroworld Admin","slug":"astroworld-admin","scheme":"astroworldadmin","version":"0.1.0",
-    "orientation":"portrait","userInterfaceStyle":"dark","newArchEnabled":true,
-    "ios":{"supportsTablet":true,"bundleIdentifier":"za.co.astroworld420.admin"},
-    "android":{"package":"za.co.astroworld420.admin","adaptiveIcon":{"backgroundColor":"#080B10"}},
-    "plugins":[["expo-secure-store",{"configureAndroidBackup":true}],"expo-sqlite"]
+  "expo": {
+    "name": "Astroworld Admin",
+    "slug": "astroworld-admin",
+    "scheme": "astroworldadmin",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "za.co.astroworld420.admin"
+    },
+    "android": {
+      "package": "za.co.astroworld420.admin",
+      "adaptiveIcon": {
+        "backgroundColor": "#080B10"
+      }
+    },
+    "plugins": [
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true
+        }
+      ],
+      "expo-sqlite"
+    ],
+    "web": {
+      "bundler": "metro"
+    }
   }
 }

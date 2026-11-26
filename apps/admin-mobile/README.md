@@ -64,3 +64,21 @@ A queued sale is not a confirmed sale: it is not counted as revenue, is not mark
 ## Security notes
 
 The mobile client uses only the public anon/publishable key. RLS and Step 1's role-checked SQL functions enforce access. Hiding a button is not an authorisation control. invite-staff checks the caller JWT and active Super Admin profile before using SUPABASE_SERVICE_ROLE_KEY on the server.
+## Browser preview in VS Code (GitHub Codespaces)
+
+The repository can be previewed in a browser through Expo Web. The browser adapter uses tab-scoped session storage for preview; this is not equivalent to native Keychain/Android Keystore protection and is not a recommendation to deploy the admin console as a public website.
+
+1. Open the repository branch in GitHub Codespaces (not the lightweight github.dev editor).
+2. Open the terminal and run:
+
+~~~bash
+cd apps/admin-mobile
+npm install
+npx expo install --check
+npx expo start --web --port 8081
+~~~
+
+3. In the Ports panel, forward port 8081 and open the forwarded URL. The Expo CLI may also display a browser preview URL.
+4. Add the Supabase URL and public anon/publishable key to a local .env file to sign in. Do not add a service-role key to this app.
+
+The web preview uses expo-sqlite's WebAssembly build. metro.config.js adds WASM asset support and the COEP/COOP headers required for SharedArrayBuffer. Native Android/iOS builds continue using OS secure storage and native SQLite.

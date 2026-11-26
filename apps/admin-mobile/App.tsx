@@ -46,6 +46,8 @@ export default function App(){
   const [booting,setBooting]=useState(true);
   const [busy,setBusy]=useState(false);
   const [tab,setTab]=useState<Tab>("Home");
+  const [salesView,setSalesView]=useState<"register"|"history">("register");
+  const [salesFilter,setSalesFilter]=useState<"all"|"paid"|"unpaid"|"refunded"|"cancelled">("all");
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
   const [products,setProducts]=useState<Product[]>([]);
@@ -313,8 +315,12 @@ export default function App(){
   </>;
 
   const salesScreen=()=> <>
-    <Heading title="Point of sale" hint="Server-priced · stock-safe · idempotent"/>
-    <Card>
+    <Heading title="Sales" hint="Fast counter checkout and transaction history"/>
+    <View style={s.row}>
+      <Button title="Register" small kind={salesView==="register"?"primary":"secondary"} onPress={()=>setSalesView("register")}/>
+      <Button title="Sales history" small kind={salesView==="history"?"primary":"secondary"} onPress={()=>setSalesView("history")}/>
+    </View>
+    {salesView==="register"?<Card>
       <Text style={s.cardTitle}>Build a sale</Text>
       <Field label="Customer name (optional)" value={customerName} onChange={setCustomerName}/>
       <Text style={s.fieldLabel}>Payment at counter</Text>
@@ -334,9 +340,11 @@ export default function App(){
         <Text style={s.micro}>Estimate only. Postgres calculates the final tiered total and checks stock during checkout.</Text>
         <Button title={busy?"Saving...":"Complete sale"} disabled={busy||!cart.length} onPress={()=>void checkout()}/>
       </>:<Text style={s.muted}>Tap a product to add it to the cart.</Text>}
-    </Card>
-    <Heading title="Recent sales" hint="Latest 30 records"/>
-    {sales.map(sale=><Card key={sale.id} style={s.compact}>
+    </Card>:null}
+    {salesView==="history"?<>
+    <Heading title="Sales history" hint="Latest 30 transactions"/>
+    <View style={s.wrap}>{(["all","paid","unpaid","refunded","cancelled"] as const).map(filter=><Button key={filter} title={filter.toUpperCase()} small kind={salesFilter===filter?"primary":"secondary"} onPress={()=>setSalesFilter(filter)}/>)}</View>
+    {sales.filter(sale=>salesFilter==="all"||(salesFilter==="cancelled"?sale.status==="cancelled":sale.payment_status===salesFilter)).map(sale=><Card key={sale.id} style={s.compact}>
       <View style={s.rowBetween}><View style={{flex:1}}><Text style={s.cardTitle}>{sale.ref}</Text><Text style={s.muted}>{sale.customer_name||"Walk-in"} · {new Date(sale.created_at).toLocaleString()}</Text></View>
         <View style={{alignItems:"flex-end"}}><Text style={s.metricValue}>{money(sale.total_cents)}</Text><Text style={sale.payment_status==="paid"?s.paid:s.unpaid}>{sale.payment_status.toUpperCase()}</Text></View></View>
       {sale.payment_method?<Text style={s.micro}>Paid by {sale.payment_method}</Text>:null}
@@ -348,6 +356,7 @@ export default function App(){
         {superAdmin&&sale.status==="active"&&sale.payment_status==="paid"?<Button title="Refund + restock" small kind="danger" onPress={()=>saleAction(sale,"refund")}/>:null}
       </View>
     </Card>)}
+    </>:null}
   </>;
 
   const inventoryScreen=()=> <>

@@ -208,7 +208,7 @@ begin
              (s.clock_out_at is null) as is_open
         from public.attendance_shifts s
         join public.profiles p on p.id = s.employee_id
-       where s.clock_in_at >= now() - make_interval(days => p_days)
+       where (s.clock_in_at >= now() - make_interval(days => p_days) or s.clock_out_at is null)
          and (v_role = 'super_admin' or s.employee_id = auth.uid())
        order by s.clock_in_at desc
        limit 500

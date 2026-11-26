@@ -12,7 +12,8 @@
     "web": "expo start --web",
     "export:android": "expo export --platform android",
     "export:ios": "expo export --platform ios",
-    "export:web": "expo export --platform web"
+    "export:web": "expo export --platform web",
+    "test:inventory": "node --experimental-strip-types --test tests/inventory-format.test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.0.0",

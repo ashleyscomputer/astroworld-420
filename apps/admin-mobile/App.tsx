@@ -1,8 +1,13 @@
 import React,{useCallback,useEffect,useMemo,useState} from "react";
 import {
   ActivityIndicator,Alert,KeyboardAvoidingView,Modal,Platform,Pressable,
-  ScrollView,StatusBar,StyleSheet,Text,TextInput,View
+  ScrollView,StatusBar,StyleSheet,Text as NativeText,TextInput,View
 } from "react-native";
+import type { TextProps, TextStyle } from "react-native";
+import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from "@expo-google-fonts/inter";
+import { Ionicons } from "@expo/vector-icons";
+import { colors } from "./src/theme/colors";
+import { Button, Field, Card, Heading, Metric } from "./src/components/ui/Primitives";
 import type {Session} from "@supabase/supabase-js";
 import {assertSupabaseConfigured,supabase,supabaseConfigured} from "./src/lib/supabase";
 import {
@@ -11,7 +16,14 @@ import {
 } from "./src/lib/offline";
 import type {CartLine,Member,PaymentMethod,Product,Profile,QueuedSale,Sale} from "./src/types";
 
-const T={bg:colors.background,surface:colors.surface,raised:colors.elevated,line:colors.border,text:colors.text,muted:colors.muted,green:colors.accent,greenDark:"#28351A",purple:colors.purple,purpleDark:"#29213F",red:colors.danger,amber:colors.warning};\n\nfunction Text({style,...props}:TextProps){\n  const flattened=StyleSheet.flatten(style) as TextStyle|undefined;\n  const weight=flattened?.fontWeight;\n  const family=weight==="900"||weight==="800"||weight==="700"||weight==="bold"?"Inter_700Bold":weight==="600"?"Inter_600SemiBold":weight==="500"?"Inter_500Medium":"Inter_400Regular";\n  return <NativeText {...props} style={[{fontFamily:family},style]}/>;\n}
+const T={bg:colors.background,surface:colors.surface,raised:colors.elevated,line:colors.border,text:colors.text,muted:colors.muted,green:colors.accent,greenDark:"#28351A",purple:colors.purple,purpleDark:"#29213F",red:colors.danger,amber:colors.warning};
+
+function Text({style,...props}:TextProps){
+  const flattened=StyleSheet.flatten(style) as TextStyle|undefined;
+  const weight=flattened?.fontWeight;
+  const family=weight==="900"||weight==="800"||weight==="700"||weight==="bold"?"Inter_700Bold":weight==="600"?"Inter_600SemiBold":weight==="500"?"Inter_500Medium":"Inter_400Regular";
+  return <NativeText {...props} style={[{fontFamily:family},style]}/>;
+}
 type Tab="Home"|"Sales"|"Inventory"|"Members"|"More";
 type ModalKind="payment"|"restock"|"adjust"|"prices"|"threshold"|"cost"|"newProduct"|"newMember"|"agreement"|"verifyPass"|"staff"|"expense"|null;
 type ModalState={kind:ModalKind;product?:Product;sale?:Sale;member?:Member};
@@ -472,7 +484,7 @@ const s=StyleSheet.create({
   tabItem:{alignItems:"center",justifyContent:"center",gap:5,minWidth:55},
   tabDot:{width:5,height:5,borderRadius:3,backgroundColor:"#4D5966"},
   tabDotActive:{width:16,backgroundColor:T.green},
-  tabLabel:{fontSize:10,color:"#718091",fontWeight:"700"},tabLabelActive:{color:T.text},
+  tabLabel:{fontSize:10,color:"#A6A2B1",fontWeight:"700"},tabLabelActive:{color:T.text},
   modalBackdrop:{flex:1,justifyContent:"flex-end",backgroundColor:"rgba(0,0,0,0.72)"},
   modalCard:{backgroundColor:T.surface,padding:20,borderTopLeftRadius:24,borderTopRightRadius:24,borderColor:T.line,borderWidth:1,gap:14,maxHeight:"90%"},
   modalTitle:{color:T.text,fontSize:21,fontWeight:"800"}

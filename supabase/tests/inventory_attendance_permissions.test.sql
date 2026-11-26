@@ -2,7 +2,7 @@
 -- Permission and schema checks for the private inventory/attendance app.
 
 begin;
-select plan(22);
+select plan(24);
 
 select ok(to_regclass('public.attendance_shifts') is not null, 'attendance shifts table exists');
 select ok(to_regclass('public.attendance_qr_challenges') is not null, 'attendance QR challenges table exists');

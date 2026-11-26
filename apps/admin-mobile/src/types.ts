@@ -42,3 +42,20 @@ export type Profile = {
   role: AppRole;
   active: boolean;
 };
+
+export type AttendanceShift = {
+  id: string;
+  employee_id: string;
+  employee_name: string;
+  username: string;
+  clock_in_at: string;
+  clock_out_at: string | null;
+  duration_seconds: number;
+  is_open: boolean;
+};
+
+export type AttendanceQr = {
+  payload: string;
+  expires_at: string;
+  ttl_seconds: number;
+};

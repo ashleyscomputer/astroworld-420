@@ -6,17 +6,23 @@ on:
     paths:
       - "apps/admin-mobile/**"
       - "supabase/migrations/0004_mobile_admin.sql"
+      - "supabase/migrations/0005_mobile_sale_rpc_hardening.sql"
+      - "supabase/migrations/0006_inventory_idempotency.sql"
+      - "supabase/migrations/0007_staff_attendance.sql"
       - "supabase/functions/invite-staff/**"
       - ".github/workflows/admin-mobile-check.yml"
   pull_request:
     paths:
       - "apps/admin-mobile/**"
       - "supabase/migrations/0004_mobile_admin.sql"
+      - "supabase/migrations/0005_mobile_sale_rpc_hardening.sql"
+      - "supabase/migrations/0006_inventory_idempotency.sql"
+      - "supabase/migrations/0007_staff_attendance.sql"
       - "supabase/functions/invite-staff/**"
       - ".github/workflows/admin-mobile-check.yml"
 
 jobs:
-  typecheck:
+  validate:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -29,3 +35,11 @@ jobs:
       - run: npm install
       - run: npx expo install --check
       - run: npm run typecheck
+      - name: Export Android bundle
+        run: npx expo export --platform android
+      - name: Export iOS bundle
+        run: npx expo export --platform ios
+      - name: Export web preview bundle
+        run: npx expo export --platform web
+      - name: Expo project diagnostics
+        run: npx expo-doctor

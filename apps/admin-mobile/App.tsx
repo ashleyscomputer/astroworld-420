@@ -290,6 +290,10 @@ export default function App() {
 
   const saveInventoryOperation = useCallback(async () => {
     if (!operationModal) return;
+    if (!session?.user) {
+      setNotice("Sign in again before changing inventory.");
+      return;
+    }
     if (!isSuperAdmin) {
       setNotice("Only a Super Admin can change stock.");
       setOperationModal(null);
@@ -362,7 +366,7 @@ export default function App() {
     } finally {
       setBusy(false);
     }
-  }, [operationModal, isSuperAdmin, quantityGrams, reason, refresh]);
+  }, [operationModal, isSuperAdmin, quantityGrams, reason, refresh, session]);
 
   const generateAttendanceQr = useCallback(async () => {
     setBusy(true);

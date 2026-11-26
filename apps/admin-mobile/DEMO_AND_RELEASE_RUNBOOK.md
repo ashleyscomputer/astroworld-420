@@ -33,6 +33,7 @@ cd apps/admin-mobile
 npm install
 npx expo install --check
 npm run typecheck
+npm run test:inventory
 npx expo start --web --port 8082 -c
 ```
 

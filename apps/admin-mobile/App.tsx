@@ -371,7 +371,7 @@ export default function App() {
       await refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : "Stock change failed.";
-      if (operation.kind !== "threshold" && isNetworkError(message)) {
+      if (isNetworkError(message)) {
         await enqueueInventoryOperation(operation);
         const remaining = await getPendingInventoryOperations();
         setPendingCount(remaining.length);

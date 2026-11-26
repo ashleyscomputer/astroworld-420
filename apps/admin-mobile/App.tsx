@@ -91,6 +91,13 @@ export default function App() {
     if (!session?.user || !supabaseConfigured) return;
     const pending = await getPendingInventoryOperations();
     for (const operation of pending) {
+      if (operation.actorId !== session.user.id) {
+        await markInventoryOperationError(
+          operation.requestId,
+          "Sign in with the account that created this pending stock change."
+        );
+        continue;
+      }
       try {
         if (operation.kind === "restock") {
           await rpc("restock_inventory_idempotent", {
@@ -307,6 +314,7 @@ export default function App() {
       requestId: Crypto.randomUUID(),
       kind: operationModal.kind,
       productId: operationModal.product.id,
+      actorId: session.user.id,
       quantityHalf,
       revision: operationModal.product.stock_revision,
       reason: reason.trim() || (operationModal.kind === "restock" ? "Mobile restock" : ""),

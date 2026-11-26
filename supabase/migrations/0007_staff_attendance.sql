@@ -81,7 +81,7 @@ begin
      set revoked_at = now()
    where revoked_at is null and expires_at > now();
 
-  v_token := 'AW420TIME:' || encode(gen_random_bytes(32), 'hex');
+  v_token := 'AW420TIME:' || replace(gen_random_uuid()::text || gen_random_uuid()::text, '-', '');
   insert into public.attendance_qr_challenges(token_hash, created_by, expires_at)
   values (encode(sha256(convert_to(v_token, 'UTF8')), 'hex'), auth.uid(), v_expires)
   returning id into v_id;

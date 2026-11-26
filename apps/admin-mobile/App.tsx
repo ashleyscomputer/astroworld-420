@@ -40,6 +40,7 @@ async function rpc<T=any>(name:string,params:Record<string,unknown>={}):Promise<
 }
 
 export default function App(){
+  const [fontsLoaded]=useFonts({Inter_400Regular,Inter_500Medium,Inter_600SemiBold,Inter_700Bold});
   const [session,setSession]=useState<Session|null>(null);
   const [profile,setProfile]=useState<Profile|null>(null);
   const [booting,setBooting]=useState(true);

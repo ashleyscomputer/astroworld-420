@@ -11,7 +11,7 @@ import {
 } from "./src/lib/offline";
 import type {CartLine,Member,PaymentMethod,Product,Profile,QueuedSale,Sale} from "./src/types";
 
-const T={bg:"#080B10",surface:"#111720",raised:"#17212C",line:"#253241",text:"#F3F7FA",muted:"#91A0AE",green:"#42E6A2",greenDark:"#153C31",purple:"#A58BFF",purpleDark:"#29213F",red:"#FF7185",amber:"#F5C56A"};
+const T={bg:colors.background,surface:colors.surface,raised:colors.elevated,line:colors.border,text:colors.text,muted:colors.muted,green:colors.accent,greenDark:"#28351A",purple:colors.purple,purpleDark:"#29213F",red:colors.danger,amber:colors.warning};\n\nfunction Text({style,...props}:TextProps){\n  const flattened=StyleSheet.flatten(style) as TextStyle|undefined;\n  const weight=flattened?.fontWeight;\n  const family=weight==="900"||weight==="800"||weight==="700"||weight==="bold"?"Inter_700Bold":weight==="600"?"Inter_600SemiBold":weight==="500"?"Inter_500Medium":"Inter_400Regular";\n  return <NativeText {...props} style={[{fontFamily:family},style]}/>;\n}
 type Tab="Home"|"Sales"|"Inventory"|"Members"|"More";
 type ModalKind="payment"|"restock"|"adjust"|"prices"|"threshold"|"cost"|"newProduct"|"newMember"|"agreement"|"verifyPass"|"staff"|"expense"|null;
 type ModalState={kind:ModalKind;product?:Product;sale?:Sale;member?:Member};
@@ -26,16 +26,6 @@ async function rpc<T=any>(name:string,params:Record<string,unknown>={}):Promise<
   if(error)throw new Error(error.message||name+" failed");
   return data as T;
 }
-
-function Button({title,onPress,kind="primary",small=false,disabled=false}:{title:string;onPress:()=>void;kind?:"primary"|"secondary"|"quiet"|"danger";small?:boolean;disabled?:boolean}){
-  return <Pressable disabled={disabled} onPress={onPress} style={[s.button,small&&s.buttonSmall,kind==="primary"&&s.primary,kind==="secondary"&&s.secondary,kind==="quiet"&&s.quiet,kind==="danger"&&s.danger,disabled&&s.disabled]}><Text style={[s.buttonText,kind==="quiet"&&{color:T.muted}]}>{title}</Text></Pressable>;
-}
-function Field({label,value,onChange,placeholder,type="default",secure=false}:{label:string;value:string;onChange:(v:string)=>void;placeholder?:string;type?:"default"|"email-address"|"numeric"|"decimal-pad"|"phone-pad";secure?:boolean}){
-  return <View style={s.field}><Text style={s.fieldLabel}>{label}</Text><TextInput value={value} onChangeText={onChange} placeholder={placeholder??label} placeholderTextColor="#637181" keyboardType={type} secureTextEntry={secure} autoCapitalize={type==="email-address"?"none":"sentences"} style={s.input}/></View>;
-}
-function Card({children,style}:{children:React.ReactNode;style?:any}){return <View style={[s.card,style]}>{children}</View>;}
-function Heading({title,hint}:{title:string;hint?:string}){return <View style={s.heading}><Text style={s.headingText}>{title}</Text>{hint?<Text style={s.muted}>{hint}</Text>:null}</View>;}
-function Metric({label,value,accent}:{label:string;value:string;accent:string}){return <View style={s.metric}><View style={[s.metricAccent,{backgroundColor:accent}]}/><Text style={s.metricValue}>{value}</Text><Text style={s.metricLabel}>{label}</Text></View>;}
 
 export default function App(){
   const [session,setSession]=useState<Session|null>(null);
@@ -408,7 +398,7 @@ export default function App(){
     <Card style={s.syncCard}><Text style={s.cardTitle}>Offline mode</Text><Text style={s.muted}>{queueCount} sale(s) queued locally</Text><Text style={s.micro}>Queued sales are not presented as completed until Supabase accepts them. Retry sync after reconnecting.</Text><Button title="Retry sync" small onPress={()=>void syncQueue().then(refresh)}/></Card>
   </>;
 
-  if(booting)return <View style={s.loading}><StatusBar barStyle="light-content"/><ActivityIndicator size="large" color={T.green}/><Text style={s.muted}>Opening the control room...</Text></View>;
+  if(booting||!fontsLoaded)return <View style={s.loading}><StatusBar barStyle="light-content"/><ActivityIndicator size="large" color={T.green}/><Text style={s.muted}>Opening the control room...</Text></View>;
   if(!session)return <View style={s.login}>
     <StatusBar barStyle="light-content"/><View style={s.loginGlow}/>
     <Text style={s.eyebrow}>ASTROWORLD 420</Text><Text style={s.loginTitle}>Admin access.</Text>
@@ -430,7 +420,7 @@ export default function App(){
     <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
       {tab==="Home"?home():tab==="Sales"?salesScreen():tab==="Inventory"?inventoryScreen():tab==="Members"?membersScreen():moreScreen()}
     </ScrollView>
-    <View style={s.tabBar}>{tabs.map(item=><Pressable key={item} onPress={()=>setTab(item)} style={s.tabItem}><View style={[s.tabDot,tab===item&&s.tabDotActive]}/><Text style={[s.tabLabel,tab===item&&s.tabLabelActive]}>{item}</Text></Pressable>)}</View>
+    <View style={s.tabBar}>{tabs.map(item=>{const icon=({Home:"grid",Sales:"cart",Inventory:"cube",Members:"people",More:"ellipsis-horizontal"} as const)[item];const active=tab===item;return <Pressable key={item} accessibilityRole="button" accessibilityState={{selected:active}} onPress={()=>setTab(item)} style={s.tabItem}><Ionicons name={icon as any} size={20} color={active?T.green:"#777181"}/><Text style={[s.tabLabel,active&&s.tabLabelActive]}>{item}</Text></Pressable>;})}</View>
     {renderModal()}
   </View>;
 }
@@ -438,23 +428,23 @@ export default function App(){
 const s=StyleSheet.create({
   app:{flex:1,backgroundColor:T.bg},loading:{flex:1,backgroundColor:T.bg,alignItems:"center",justifyContent:"center",gap:14},
   login:{flex:1,backgroundColor:T.bg,padding:26,paddingTop:80,justifyContent:"center",gap:17},
-  loginGlow:{position:"absolute",top:80,right:-100,width:260,height:260,borderRadius:200,backgroundColor:"#183C32",opacity:0.28},
+  loginGlow:{position:"absolute",top:80,right:-100,width:260,height:260,borderRadius:200,backgroundColor:"#4B3B65",opacity:0.28},
   loginTitle:{color:T.text,fontSize:42,fontWeight:"800",letterSpacing:-1.5},
-  hero:{padding:22,borderRadius:24,backgroundColor:"#101B1D",borderWidth:1,borderColor:"#21463C",overflow:"hidden",marginBottom:16},
+  hero:{padding:22,borderRadius:24,backgroundColor:"#191623",borderWidth:1,borderColor:"rgba(213,239,134,0.22)",overflow:"hidden",marginBottom:16},
   heroTitle:{fontSize:38,fontWeight:"800",color:T.text,letterSpacing:-1.6,marginTop:10},
   heroSub:{color:T.muted,fontSize:14,lineHeight:21,marginTop:8},
   heroAccent:{width:92,height:5,backgroundColor:T.green,borderRadius:5,marginTop:20},
   eyebrow:{color:T.green,fontWeight:"800",fontSize:11,letterSpacing:2.4},
   topBar:{flexDirection:"row",justifyContent:"space-between",alignItems:"center",paddingHorizontal:20,paddingTop:Platform.OS==="android"?42:56,paddingBottom:14,borderBottomWidth:1,borderBottomColor:T.line},
   brand:{fontSize:16,fontWeight:"900",color:T.text,letterSpacing:1.3},topSub:{color:T.muted,fontSize:9,letterSpacing:1.6,marginTop:4},
-  avatar:{width:38,height:38,borderRadius:20,backgroundColor:T.purpleDark,alignItems:"center",justifyContent:"center",borderWidth:1,borderColor:"#55458D"},
+  avatar:{width:38,height:38,borderRadius:20,backgroundColor:T.purpleDark,alignItems:"center",justifyContent:"center",borderWidth:1,borderColor:"rgba(165,139,211,0.42)"},
   avatarText:{color:T.purple,fontWeight:"900",fontSize:16},
   content:{padding:18,paddingBottom:36,gap:14},
   card:{backgroundColor:T.surface,borderColor:T.line,borderWidth:1,borderRadius:18,padding:16,gap:12},
   compact:{padding:13,gap:8},heading:{gap:4,marginTop:8,marginBottom:2},
   headingText:{color:T.text,fontSize:21,fontWeight:"800",letterSpacing:-0.5},
   cardTitle:{color:T.text,fontSize:15,fontWeight:"700"},
-  muted:{color:T.muted,fontSize:12,lineHeight:18},micro:{color:"#718091",fontSize:10,lineHeight:15},
+  muted:{color:T.muted,fontSize:12,lineHeight:18},micro:{color:"#A6A2B1",fontSize:10,lineHeight:15},
   metricGrid:{flexDirection:"row",flexWrap:"wrap",gap:10},metric:{flexGrow:1,flexBasis:"46%",minHeight:92,padding:14,borderRadius:16,borderWidth:1,borderColor:T.line,backgroundColor:T.surface,gap:5},
   metricAccent:{width:26,height:3,borderRadius:2,marginBottom:4},
   metricValue:{color:T.text,fontSize:19,fontWeight:"800",fontVariant:["tabular-nums"]},metricLabel:{color:T.muted,fontSize:11},
@@ -466,7 +456,7 @@ const s=StyleSheet.create({
   quiet:{backgroundColor:"transparent",borderWidth:1,borderColor:T.line},danger:{backgroundColor:"#4A202B",borderWidth:1,borderColor:"#713342"},
   buttonText:{color:"#07120F",fontSize:12,fontWeight:"800"},disabled:{opacity:0.45},
   field:{gap:6,marginBottom:10},fieldLabel:{color:T.muted,fontSize:11,fontWeight:"700"},
-  input:{minHeight:46,paddingHorizontal:13,borderRadius:11,borderWidth:1,borderColor:T.line,color:T.text,backgroundColor:"#0B1118",fontSize:14},
+  input:{minHeight:46,paddingHorizontal:13,borderRadius:11,borderWidth:1,borderColor:T.line,color:T.text,backgroundColor:"#1D1826",fontSize:14},
   divider:{height:1,backgroundColor:T.line,marginVertical:4},
   productPick:{flexDirection:"row",alignItems:"center",justifyContent:"space-between",gap:10,paddingVertical:9,borderBottomWidth:1,borderBottomColor:"#1C2834"},
   cartAction:{color:T.green,fontSize:22,fontWeight:"800",paddingHorizontal:6},
@@ -474,11 +464,11 @@ const s=StyleSheet.create({
   low:{color:T.red,fontSize:10,fontWeight:"900",letterSpacing:0.7},
   paid:{color:T.green,fontSize:10,fontWeight:"900",letterSpacing:0.7},
   unpaid:{color:T.amber,fontSize:10,fontWeight:"900",letterSpacing:0.7},
-  syncCard:{borderColor:"#294D43",backgroundColor:"#101A1C"},
+  syncCard:{borderColor:"rgba(213,239,134,0.20)",backgroundColor:"#191623"},
   notice:{marginHorizontal:14,marginTop:8,padding:10,borderRadius:9,backgroundColor:T.purpleDark},
   noticeText:{color:"#D5C9FF",fontSize:11},warning:{color:T.amber,fontSize:12,lineHeight:18},
   busyLine:{flexDirection:"row",alignItems:"center",gap:8,paddingHorizontal:18,paddingTop:7},
-  tabBar:{flexDirection:"row",justifyContent:"space-around",alignItems:"center",backgroundColor:"#0D131B",borderTopWidth:1,borderTopColor:T.line,paddingTop:9,paddingBottom:Platform.OS==="ios"?26:12},
+  tabBar:{flexDirection:"row",justifyContent:"space-around",alignItems:"center",backgroundColor:"#141119",borderTopWidth:1,borderTopColor:T.line,paddingTop:9,paddingBottom:Platform.OS==="ios"?26:12},
   tabItem:{alignItems:"center",justifyContent:"center",gap:5,minWidth:55},
   tabDot:{width:5,height:5,borderRadius:3,backgroundColor:"#4D5966"},
   tabDotActive:{width:16,backgroundColor:T.green},

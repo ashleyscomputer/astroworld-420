@@ -8,9 +8,9 @@ The customer-facing website, customer account journeys, checkout, memberships, a
 
 ## 1. Apply database migrations
 
-Apply migrations in numeric order in the Supabase SQL Editor or through the project's migration workflow.
+Keep the original Step 1 schema, functions and security migrations (0001-0003). Migration 0004 is a legacy sales/payment extension and is not required by this inventory app. Do not apply it solely for this app; if it has already been applied, leave it untouched.
 
-For an existing project that has already applied Step 1 migrations 0001-0004, apply:
+Apply the following migrations in order:
 
 1. `0005_mobile_sale_rpc_hardening.sql` (numbered no-op; retained for history compatibility)
 2. `0006_inventory_idempotency.sql`

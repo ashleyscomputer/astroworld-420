@@ -16,15 +16,16 @@ import {
   pendingInventoryOperationCount, removeInventoryOperation,
 } from "./src/lib/offline";
 import { formatHalfUnitsAsGrams, isNetworkError, parseGramsToHalfUnits } from "./src/lib/inventory-format";
-import type { PendingInventoryOperation, Product, Profile, StockMovement } from "./src/types";
+import type { AttendanceQr, AttendanceShift, PendingInventoryOperation, Product, Profile, StockMovement } from "./src/types";
 import LoginScreen from "./src/screens/LoginScreen";
 import DashboardScreen from "./src/screens/DashboardScreen";
 import InventoryScreen from "./src/screens/InventoryScreen";
 import ActivityScreen from "./src/screens/ActivityScreen";
 import TeamScreen from "./src/screens/TeamScreen";
 import SettingsScreen from "./src/screens/SettingsScreen";
+import AttendanceScreen from "./src/screens/AttendanceScreen";
 
-type Tab = "Overview" | "Inventory" | "Activity" | "Team" | "Settings";
+type Tab = "Overview" | "Inventory" | "Attendance" | "Activity" | "Team" | "Settings";
 type OperationKind = "restock" | "adjustment";
 type OperationModal = { kind: OperationKind; product: Product } | null;
 
@@ -46,6 +47,8 @@ export default function App() {
   const [tab, setTab] = useState<Tab>("Overview");
   const [products, setProducts] = useState<Product[]>([]);
   const [movements, setMovements] = useState<StockMovement[]>([]);
+  const [attendance, setAttendance] = useState<AttendanceShift[]>([]);
+  const [attendanceQr, setAttendanceQr] = useState<AttendanceQr | null>(null);
   const [team, setTeam] = useState<Profile[]>([]);
   const [query, setQuery] = useState("");
   const [pendingCount, setPendingCount] = useState(0);
@@ -187,6 +190,13 @@ export default function App() {
       if (!movementResult.error) setMovements(movementResult.data);
       else setNotice("Stock is current, but movement history could not be loaded. Apply migration 0006 if it has not been run.");
 
+      try {
+        const shiftRows = await rpc<AttendanceShift[]>("attendance_history", { p_days: 31 });
+        setAttendance(Array.isArray(shiftRows) ? shiftRows : []);
+      } catch (error) {
+        setNotice("Attendance is not enabled yet. Apply migration 0007_staff_attendance.sql.");
+      }
+
       if (me.role === "super_admin") {
         if (!staffResult.error && staffResult.data) setTeam(staffResult.data as Profile[]);
         else setNotice("Inventory loaded, but team accounts could not be refreshed.");
@@ -224,6 +234,8 @@ export default function App() {
       profileRef.current = null;
       setProducts([]);
       setMovements([]);
+      setAttendance([]);
+      setAttendanceQr(null);
       setTeam([]);
       setPendingCount(0);
       setConnection("loading");
@@ -331,6 +343,30 @@ export default function App() {
     }
   }, [operationModal, isSuperAdmin, quantityGrams, reason, refresh]);
 
+  const generateAttendanceQr = useCallback(async () => {
+    setBusy(true);
+    try {
+      const result = await rpc<AttendanceQr>("issue_attendance_qr");
+      setAttendanceQr(result);
+      setNotice("A fresh workplace QR is ready. It expires in 90 seconds.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Could not generate attendance QR.");
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
+  const recordAttendanceScan = useCallback(async (payload: string): Promise<string> => {
+    const result = await rpc<{ event: "clock_in" | "clock_out"; recorded_at: string; duration_seconds: number }>(
+      "record_attendance_scan", { p_token: payload }
+    );
+    await refresh();
+    const time = new Date(result.recorded_at).toLocaleTimeString();
+    return result.event === "clock_in"
+      ? "Clock-in recorded by the server at " + time + "."
+      : "Clock-out recorded by the server at " + time + ". Shift: " + Math.floor(result.duration_seconds / 3600) + "h " + Math.floor((result.duration_seconds % 3600) / 60) + "m.";
+  }, [refresh]);
+
   const inviteStaff = useCallback(async (details: { email: string; username: string; fullName: string }) => {
     setBusy(true);
     try {
@@ -404,8 +440,8 @@ export default function App() {
   }
 
   const tabs: Tab[] = isSuperAdmin
-    ? ["Overview", "Inventory", "Activity", "Team", "Settings"]
-    : ["Overview", "Inventory", "Activity", "Settings"];
+    ? ["Overview", "Inventory", "Attendance", "Activity", "Team", "Settings"]
+    : ["Overview", "Inventory", "Attendance", "Activity", "Settings"];
 
   const renderScreen = () => {
     switch (tab) {
@@ -430,6 +466,17 @@ export default function App() {
             pendingProductIds={pendingProductIds}
             onRestock={(product) => openOperation(product, "restock")}
             onAdjust={(product) => openOperation(product, "adjustment")}
+          />
+        );
+      case "Attendance":
+        return (
+          <AttendanceScreen
+            isSuperAdmin={Boolean(isSuperAdmin)}
+            qr={attendanceQr}
+            history={attendance}
+            busy={busy}
+            onIssueQr={() => void generateAttendanceQr()}
+            onScan={recordAttendanceScan}
           />
         );
       case "Activity":
@@ -465,6 +512,7 @@ export default function App() {
   const iconByTab: Record<Tab, string> = {
     Overview: "grid-outline",
     Inventory: "cube-outline",
+    Attendance: "qr-code-outline",
     Activity: "time-outline",
     Team: "people-outline",
     Settings: "settings-outline",

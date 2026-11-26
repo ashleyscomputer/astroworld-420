@@ -1,0 +1,31 @@
+name: Admin mobile checks
+
+on:
+  push:
+    branches: [admin-mobile-step2]
+    paths:
+      - "apps/admin-mobile/**"
+      - "supabase/migrations/0004_mobile_admin.sql"
+      - "supabase/functions/invite-staff/**"
+      - ".github/workflows/admin-mobile-check.yml"
+  pull_request:
+    paths:
+      - "apps/admin-mobile/**"
+      - "supabase/migrations/0004_mobile_admin.sql"
+      - "supabase/functions/invite-staff/**"
+      - ".github/workflows/admin-mobile-check.yml"
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/admin-mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.13"
+      - run: npm install
+      - run: npx expo install --fix
+      - run: npm run typecheck

@@ -10,6 +10,7 @@ on:
       - "supabase/migrations/0006_inventory_idempotency.sql"
       - "supabase/migrations/0007_staff_attendance.sql"
       - "supabase/migrations/0008_restore_legacy_client_sales_rpcs.sql"
+      - "supabase/tests/**"
       - "supabase/functions/invite-staff/**"
       - ".github/workflows/admin-mobile-check.yml"
   pull_request:
@@ -19,6 +20,8 @@ on:
       - "supabase/migrations/0005_mobile_sale_rpc_hardening.sql"
       - "supabase/migrations/0006_inventory_idempotency.sql"
       - "supabase/migrations/0007_staff_attendance.sql"
+      - "supabase/migrations/0008_restore_legacy_client_sales_rpcs.sql"
+      - "supabase/tests/**"
       - "supabase/functions/invite-staff/**"
       - ".github/workflows/admin-mobile-check.yml"
 

@@ -521,7 +521,7 @@ export default function App() {
             qr={attendanceQr}
             history={attendance}
             busy={busy}
-            onIssueQr={() => void generateAttendanceQr()}
+            onIssueQr={generateAttendanceQr}
             onScan={recordAttendanceScan}
           />
         );

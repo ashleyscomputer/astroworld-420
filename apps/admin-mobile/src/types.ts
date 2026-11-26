@@ -28,6 +28,7 @@ export type PendingInventoryOperation = {
   requestId: string;
   kind: "restock" | "adjustment";
   productId: string;
+  actorId: string;
   quantityHalf: number;
   revision: number;
   reason: string;

@@ -13,10 +13,11 @@ type Props = {
   pendingProductIds: string[];
   onRestock: (product: Product) => void;
   onAdjust: (product: Product) => void;
+  onThreshold: (product: Product) => void;
 };
 
 export default function InventoryScreen({
-  products, query, onQueryChange, isSuperAdmin, pendingProductIds, onRestock, onAdjust,
+  products, query, onQueryChange, isSuperAdmin, pendingProductIds, onRestock, onAdjust, onThreshold,
 }: Props) {
   const filtered = products
     .filter((product) => (product.name + " " + product.id).toLowerCase().includes(query.trim().toLowerCase()))
@@ -60,6 +61,7 @@ export default function InventoryScreen({
               <View style={styles.actions}>
                 <Button title="Restock" small onPress={() => onRestock(product)} />
                 <Button title="Set quantity" small kind="secondary" onPress={() => onAdjust(product)} />
+                <Button title="Alert level" small kind="quiet" onPress={() => onThreshold(product)} />
               </View>
             ) : (
               <Text style={styles.micro}>Staff access · Read-only stock view.</Text>

@@ -13,7 +13,7 @@ import { assertSupabaseConfigured, supabase, supabaseConfigured } from "./src/li
 import {
   cacheProducts, enqueueInventoryOperation, getCachedProducts,
   getPendingInventoryOperations, markInventoryOperationError,
-  pendingInventoryOperationCount, removeInventoryOperation,
+  removeInventoryOperation,
 } from "./src/lib/offline";
 import { formatHalfUnitsAsGrams, isNetworkError, parseGramsToHalfUnits } from "./src/lib/inventory-format";
 import type { AttendanceQr, AttendanceShift, PendingInventoryOperation, Product, Profile, StockMovement } from "./src/types";
@@ -212,9 +212,21 @@ export default function App() {
       setPendingProductIds(remaining.map((item) => item.productId));
     } catch (error) {
       const message = error instanceof Error ? error.message : "Could not refresh inventory.";
-      if (isNetworkError(message) && profileRef.current) {
+      if (isNetworkError(message) && session?.user) {
         const cached = await getCachedProducts();
         if (cached.length) setProducts(cached);
+        if (!profileRef.current) {
+          // Offline fallback is deliberately least-privileged until the server verifies the role.
+          const offlineProfile: Profile = {
+            id: session.user.id,
+            username: session.user.email || "offline-user",
+            full_name: "Offline session",
+            role: "staff",
+            active: true,
+          };
+          profileRef.current = offlineProfile;
+          setProfile(offlineProfile);
+        }
         setConnection("offline");
         setNotice("Offline mode: showing the last saved stock snapshot. New stock changes will stay pending until confirmed.");
       } else {
@@ -362,7 +374,7 @@ export default function App() {
       "record_attendance_scan", { p_token: payload }
     );
     await refresh();
-    const time = new Date(result.recorded_at).toLocaleTimeString();
+    const time = new Intl.DateTimeFormat("en-ZA", { timeStyle: "short", timeZone: "Africa/Johannesburg" }).format(new Date(result.recorded_at));
     return result.event === "clock_in"
       ? "Clock-in recorded by the server at " + time + "."
       : "Clock-out recorded by the server at " + time + ". Shift: " + Math.floor(result.duration_seconds / 3600) + "h " + Math.floor((result.duration_seconds % 3600) / 60) + "m.";

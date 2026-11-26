@@ -47,6 +47,8 @@ export default function App(){
   const [busy,setBusy]=useState(false);
   const [tab,setTab]=useState<Tab>("Home");
   const [salesView,setSalesView]=useState<"register"|"history">("register");
+  const [inventoryQuery,setInventoryQuery]=useState("");
+  const [memberQuery,setMemberQuery]=useState("");
   const [salesFilter,setSalesFilter]=useState<"all"|"paid"|"unpaid"|"refunded"|"cancelled">("all");
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
@@ -110,13 +112,13 @@ export default function App(){
       supabase.from("members").select("id,full_name,phone,email,status,created_at").order("created_at",{ascending:false}).limit(50),
       (supabase as any).rpc("ops_summary")
     ]);
-    if(!productResult.error&&productResult.data){
+    if(!productResult.error&&!stockResult.error&&productResult.data){
       const stockMap=new Map<string,any>((stockResult.data??[]).map((row:any)=>[row.product_id,row]));
       const joined=(productResult.data as any[]).map(p=>({...p,half_units:Number(stockMap.get(p.id)?.half_units??0),stock_revision:Number(stockMap.get(p.id)?.revision??0)} as Product));
       setProducts(joined);await cacheProducts(joined);
     }else{
       const cached=await getCachedProducts();if(cached.length)setProducts(cached);
-      setNotice("Showing cached inventory. Refresh when connected.");
+      setNotice("Inventory or stock could not be refreshed. Showing the last verified cache where available.");
     }
     if(!salesResult.error&&salesResult.data)setSales(salesResult.data as Sale[]);
     if(!membersResult.error&&membersResult.data)setMembers(membersResult.data as Member[]);
@@ -360,8 +362,9 @@ export default function App(){
 
   const inventoryScreen=()=> <>
     <Heading title="Inventory" hint="Stock uses 0.5 g increments"/>
+    <Field label="Search products" value={inventoryQuery} onChange={setInventoryQuery} placeholder="Find a product..."/>
     {superAdmin?<Button title="+ Add product" onPress={()=>openModal("newProduct")}/>:null}
-    {products.map(p=>{
+    {products.filter(p=>p.name.toLowerCase().includes(inventoryQuery.trim().toLowerCase())).map(p=>{
       const low=p.half_units<=p.low_stock_half_units;
       return <Card key={p.id}>
         <View style={s.rowBetween}><View style={{flex:1}}><Text style={s.cardTitle}>{p.name}</Text><Text style={s.muted}>{p.id}</Text></View><Text style={[s.stockValue,low&&{color:T.red}]}>{grams(p.half_units)} g</Text></View>
@@ -380,8 +383,9 @@ export default function App(){
 
   const membersScreen=()=> <>
     <Heading title="Members" hint="Requests, membership and pass verification"/>
+    <Field label="Search members" value={memberQuery} onChange={setMemberQuery} placeholder="Name, phone or email..."/>
     <View style={s.row}><Button title="+ New member" onPress={()=>openModal("newMember")}/><Button title="Verify pass" kind="secondary" onPress={()=>openModal("verifyPass")}/></View>
-    {members.map(member=><Card key={member.id}>
+    {members.filter(member=>[member.full_name,member.phone??"",member.email??""].some(value=>value.toLowerCase().includes(memberQuery.trim().toLowerCase()))).map(member=><Card key={member.id}>
       <View style={s.rowBetween}><View style={{flex:1}}><Text style={s.cardTitle}>{member.full_name}</Text><Text style={s.muted}>{member.phone||member.email||"No contact details"}</Text></View><Text style={member.status==="active"?s.paid:member.status==="pending"?s.unpaid:s.low}>{member.status.toUpperCase()}</Text></View>
       <Text style={s.micro}>Added {new Date(member.created_at).toLocaleDateString()}</Text>
       <View style={s.wrap}>
